@@ -57,7 +57,7 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lista_eventos.append(corrida.fp3)
 
     for evento in lista_eventos:
-        adiciona_lembrete(scheduler, evento.dia_hora_datetime, update)
+        adiciona_lembrete(scheduler, evento.dia_hora_datetime(), update)
 
     scheduler.start()
     await update.message.reply_text("Notificação foi ligada.")
