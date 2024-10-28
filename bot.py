@@ -1,12 +1,11 @@
-from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import os
-import logging
-from dotenv import load_dotenv
-import requests
-from diskcache import Cache
-
 from models.corrida import Corrida
+from dotenv import load_dotenv
+from diskcache import Cache
+from telegram import Update
+import requests
+import logging
+import os
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -35,7 +34,7 @@ async def proxima(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if response.status_code == 200:
             data = response.json()
             cache.set(url, data, expire=10*24*60*60)
-            
+
     race_table = data['MRData']['RaceTable']
     round = race_table['Races'][0]
     round_atual = Corrida(round)
