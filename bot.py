@@ -1,10 +1,12 @@
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from models.corrida import Corrida
 from dotenv import load_dotenv
+from datetime import datetime
 from diskcache import Cache
 from telegram import Update
 import requests
 import logging
+import pytz
 import os
 
 load_dotenv()
@@ -19,6 +21,15 @@ url = "https://api.jolpi.ca/ergast/f1/2024/21.json"
 cache = Cache('jolpi_cache')
 
 logger = logging.getLogger(__name__)
+
+def dataCorrida(data_corrida):
+    data_corrida_datetime = datetime.strptime(data_corrida, "%Y-%m-%d %H:%M:%SZ").replace(tzinfo=pytz.UTC)
+    data_corrida_datetime = data_corrida_datetime.astimezone(pytz.timezone("America/Sao_Paulo"))
+    data_hoje = datetime.now().astimezone(pytz.timezone("America/Sao_Paulo"))
+
+    if data_corrida_datetime < data_hoje:
+        return True
+    return False
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Hello")
@@ -36,8 +47,18 @@ async def proxima(update: Update, context: ContextTypes.DEFAULT_TYPE):
             cache.set(url, data, expire=10*24*60*60)
 
     race_table = data['MRData']['RaceTable']
-    round = race_table['Races'][0]
-    round_atual = Corrida(round)
+    rounds = race_table['Races']
+
+    round_numero = 0
+
+    for round in rounds:
+        if dataCorrida(f"{round['date']} {round['time']}"):
+            pass
+        else:
+            round_numero = round
+            break
+
+    round_atual = Corrida(round_numero)
 
     message = (
         f"<b>{ round_atual.granprix }</b>\n"
