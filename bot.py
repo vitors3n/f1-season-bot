@@ -25,16 +25,13 @@ cache = Cache('jolpi_cache')
 logger = logging.getLogger(__name__)
 bot = Bot(token=BOT_TOKEN)
 
-def adiciona_lembrete(scheduler, data_completa, update):
+def adiciona_lembrete(scheduler, data_evento, update):
     chat_id = update.message.chat.id
-    message_thread_id = update.message.message_thread_id
-    
-    reminder_10_minutes = data_completa - timedelta(minutes=10)
-    reminder_5_minutes = data_completa - timedelta(minutes=5)
-
-    scheduler.add_job(enviar_lembrete, 'date', run_date=reminder_10_minutes, args=[update, chat_id, message_thread_id, 10])
-    scheduler.add_job(enviar_lembrete, 'date', run_date=reminder_5_minutes, args=[update, chat_id, message_thread_id, 5])
-    print('Lembretes adicionados.')
+    msg_thread_id = update.message.message_thread_id
+    lembrete_10_minutos = data_evento - timedelta(minutes=10)
+    lembrete_5_minutos = data_evento - timedelta(minutes=5)
+    scheduler.add_job(enviar_lembrete, 'date', run_date=lembrete_10_minutos, args=[update, chat_id, msg_thread_id, 10])
+    scheduler.add_job(enviar_lembrete, 'date', run_date=lembrete_5_minutos, args=[update, chat_id, msg_thread_id, 5])
 
 async def enviar_lembrete(update, chat_id, message_thread_id, minutes_before):
     print(f"Lembrete: {minutes_before} minutos para o próximo evento começar")
