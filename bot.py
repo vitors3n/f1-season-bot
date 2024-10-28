@@ -9,9 +9,7 @@ import requests
 import logging
 import pytz
 import os
-import asyncio
 
-from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime, timedelta
 
@@ -30,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 bot = Bot(token=BOT_TOKEN)
 
-def adicionaLembrete(scheduler, data_completa, update):
+def adiciona_lembrete(scheduler, data_completa, update):
     chat_id = update.message.chat.id
     message_thread_id = update.message.message_thread_id
     
@@ -55,21 +53,21 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     evento_fp1 = round.fp1.dia_hora_datetime()
     evento_quali = round.quali.dia_hora_datetime()
 
-    adicionaLembrete(scheduler, evento_corrida, update)
-    adicionaLembrete(scheduler, evento_fp1, update)
-    adicionaLembrete(scheduler, evento_quali, update)
+    adiciona_lembrete(scheduler, evento_corrida, update)
+    adiciona_lembrete(scheduler, evento_fp1, update)
+    adiciona_lembrete(scheduler, evento_quali, update)
 
     if round.sprint_quali:
         evento_spring_quali = round.sprint_quali.dia_hora_datetime()
         evento_spring = round.sprint.dia_hora_datetime()
-        adicionaLembrete(scheduler, evento_spring_quali, update)
-        adicionaLembrete(scheduler, evento_spring, update)
+        adiciona_lembrete(scheduler, evento_spring_quali, update)
+        adiciona_lembrete(scheduler, evento_spring, update)
     
     if not round.sprint_quali:
         evento_fp2 = round.fp2.dia_hora_datetime()
         evento_fp3 = round.fp3.dia_hora_datetime()
-        adicionaLembrete(scheduler, evento_fp2, update)
-        adicionaLembrete(scheduler, evento_fp3, update)
+        adiciona_lembrete(scheduler, evento_fp2, update)
+        adiciona_lembrete(scheduler, evento_fp3, update)
 
     scheduler.start()
     await update.message.reply_text("Notificação foi ligada.")
