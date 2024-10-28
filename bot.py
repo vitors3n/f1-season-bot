@@ -45,16 +45,16 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     scheduler = AsyncIOScheduler()
     jobs = scheduler.get_jobs()
 
-    round = pega_corrida()
-    lista_eventos = [round, round.fp1, round.quali]
+    corrida = pega_corrida()
+    lista_eventos = [corrida, corrida.fp1, corrida.quali]
 
-    if round.sprint:
-        lista_eventos.append(round.sprint_quali)
-        lista_eventos.append(round.sprint)
+    if corrida.sprint:
+        lista_eventos.append(corrida.sprint_quali)
+        lista_eventos.append(corrida.sprint)
     
-    if not round.sprint:
-        lista_eventos.append(round.fp2)
-        lista_eventos.append(round.fp3)
+    if not corrida.sprint:
+        lista_eventos.append(corrida.fp2)
+        lista_eventos.append(corrida.fp3)
 
     for evento in lista_eventos:
         adiciona_lembrete(scheduler, evento.dia_hora_datetime, update)
