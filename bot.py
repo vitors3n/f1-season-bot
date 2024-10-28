@@ -1,7 +1,8 @@
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from datetime import datetime, timedelta
 from models.corrida import Corrida
 from dotenv import load_dotenv
-from datetime import datetime
 from diskcache import Cache
 from telegram import Update
 from telegram import Bot
@@ -9,9 +10,6 @@ import requests
 import logging
 import pytz
 import os
-
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from datetime import datetime, timedelta
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
