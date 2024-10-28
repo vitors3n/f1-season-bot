@@ -49,25 +49,18 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     jobs = scheduler.get_jobs()
 
     round = pega_round()
-    evento_corrida = round.dia_hora_datetime()
-    evento_fp1 = round.fp1.dia_hora_datetime()
-    evento_quali = round.quali.dia_hora_datetime()
+    lista_eventos = [round, round.fp1, round.quali]
 
-    adiciona_lembrete(scheduler, evento_corrida, update)
-    adiciona_lembrete(scheduler, evento_fp1, update)
-    adiciona_lembrete(scheduler, evento_quali, update)
-
-    if round.sprint_quali:
-        evento_spring_quali = round.sprint_quali.dia_hora_datetime()
-        evento_spring = round.sprint.dia_hora_datetime()
-        adiciona_lembrete(scheduler, evento_spring_quali, update)
-        adiciona_lembrete(scheduler, evento_spring, update)
+    if round.sprint:
+        lista_eventos.append(round.sprint_quali)
+        lista_eventos.append(round.sprint)
     
-    if not round.sprint_quali:
-        evento_fp2 = round.fp2.dia_hora_datetime()
-        evento_fp3 = round.fp3.dia_hora_datetime()
-        adiciona_lembrete(scheduler, evento_fp2, update)
-        adiciona_lembrete(scheduler, evento_fp3, update)
+    if not round.sprint:
+        lista_eventos.append(round.fp2)
+        lista_eventos.append(round.fp3)
+
+    for evento in lista_eventos:
+        adiciona_lembrete(scheduler, evento.dia_hora_datetime, update)
 
     scheduler.start()
     await update.message.reply_text("Notificação foi ligada.")
