@@ -45,7 +45,7 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     scheduler = AsyncIOScheduler()
     jobs = scheduler.get_jobs()
 
-    round = pega_round()
+    round = pega_corrida()
     lista_eventos = [round, round.fp1, round.quali]
 
     if round.sprint:
@@ -103,7 +103,7 @@ def pega_corrida():
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Hello")
 
-async def proxima(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def next(update: Update, context: ContextTypes.DEFAULT_TYPE):
     corrida = pega_corrida()
 
     message = f"<b>{ corrida.granprix }</b>\n"
@@ -125,7 +125,7 @@ async def proxima(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("proxima", proxima))
+    application.add_handler(CommandHandler("next", next))
     application.add_handler(CommandHandler("notify", notify))
     application.run_polling()
 
