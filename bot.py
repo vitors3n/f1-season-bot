@@ -65,7 +65,7 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for job in jobs:
         print(f"Job ID: {job.id}, próxima run: {job.next_run_time}")
 
-def dataCorrida(data_corrida):
+def corrida_passou(data_corrida):
     data_corrida_datetime = datetime.strptime(data_corrida, "%Y-%m-%d %H:%M:%SZ").replace(tzinfo=pytz.UTC)
     data_corrida_datetime = data_corrida_datetime.astimezone(pytz.timezone("America/Sao_Paulo"))
     data_hoje = datetime.now().astimezone(pytz.timezone("America/Sao_Paulo"))
@@ -74,7 +74,7 @@ def dataCorrida(data_corrida):
         return True
     return False
 
-def pega_round():
+def pega_corrida():
     data = cache.get(url)
     
     if data is not None:
@@ -86,40 +86,39 @@ def pega_round():
             data = response.json()
             cache.set(url, data, expire=10*24*60*60)
 
-    race_table = data['MRData']['RaceTable']
-    rounds = race_table['Races']
+    corridas = data['MRData']['RaceTable']['Races']
 
-    round_numero = 0
+    proxima_corrida_json = ''
 
-    for round in rounds:
-        if dataCorrida(f"{round['date']} {round['time']}"):
+    for corrida in corridas:
+        if corrida_passou(f"{corrida['date']} {corrida['time']}"):
             pass
         else:
-            round_numero = round
+            proxima_corrida_json = corrida
             break
 
-    round_atual = Corrida(round_numero)
-    return round_atual
+    proxima_corrida = Corrida(proxima_corrida_json)
+    return proxima_corrida
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Hello")
 
 async def proxima(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    round_atual = pega_round()
+    corrida = pega_corrida()
 
-    message = f"<b>{ round_atual.granprix }</b>\n"
-    message += f"{ round_atual.circuito }\n\n"
-    message += f"<b>FP1:</b> { round_atual.fp1.dia_hora() }\n\n"
+    message = f"<b>{ corrida.granprix }</b>\n"
+    message += f"{ corrida.circuito }\n\n"
+    message += f"<b>FP1:</b> { corrida.fp1.dia_hora() }\n\n"
 
-    if round_atual.sprint:
-        message += f"<b>SprintQuali:</b> { round_atual.sprint_quali.dia_hora() }\n\n"
-        message += f"<b>Sprint:</b> { round_atual.sprint.dia_hora() }\n\n"
-    if not round_atual.sprint:
-        message += f"<b>FP2:</b> { round_atual.fp2.dia_hora() }\n\n"
-        message += f"<b>FP3:</b> { round_atual.fp3.dia_hora() }\n\n"
+    if corrida.sprint:
+        message += f"<b>SprintQuali:</b> { corrida.sprint_quali.dia_hora() }\n\n"
+        message += f"<b>Sprint:</b> { corrida.sprint.dia_hora() }\n\n"
+    if not corrida.sprint:
+        message += f"<b>FP2:</b> { corrida.fp2.dia_hora() }\n\n"
+        message += f"<b>FP3:</b> { corrida.fp3.dia_hora() }\n\n"
 
-    message += f"<b>Quali:</b> { round_atual.quali.dia_hora() }\n\n"
-    message += f"<b>Corrida:</b> { round_atual.dia_hora() }"
+    message += f"<b>Quali:</b> { corrida.quali.dia_hora() }\n\n"
+    message += f"<b>Corrida:</b> { corrida.dia_hora() }"
 
     await update.message.reply_text(message, parse_mode='HTML')
 
