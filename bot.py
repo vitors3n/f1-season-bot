@@ -37,14 +37,13 @@ def adicionaLembrete(scheduler, data_completa, update):
     reminder_10_minutes = data_completa - timedelta(minutes=10)
     reminder_5_minutes = data_completa - timedelta(minutes=5)
 
-    scheduler.add_job(send_reminder, 'date', run_date=reminder_10_minutes, args=[update, chat_id, message_thread_id, 10])
-    scheduler.add_job(send_reminder, 'date', run_date=reminder_5_minutes, args=[update, chat_id, message_thread_id, 5])
+    scheduler.add_job(enviar_lembrete, 'date', run_date=reminder_10_minutes, args=[update, chat_id, message_thread_id, 10])
+    scheduler.add_job(enviar_lembrete, 'date', run_date=reminder_5_minutes, args=[update, chat_id, message_thread_id, 5])
     print('Lembretes adicionados.')
 
-async def send_reminder(update, chat_id, message_thread_id, minutes_before):
-    print(f"Lembrete: {minutes_before} minutos até as 15:11")
-    await bot.send_message(chat_id=chat_id, text=f"Lembrete: {minutes_before} minutos o próximo evento começar", reply_to_message_id=message_thread_id)
-    print('deveria ter enviado')
+async def enviar_lembrete(update, chat_id, message_thread_id, minutes_before):
+    print(f"Lembrete: {minutes_before} minutos para o próximo evento começar")
+    await bot.send_message(chat_id=chat_id, text=f"Lembrete: {minutes_before} minutos para o próximo evento começar", reply_to_message_id=message_thread_id)
 
 async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -76,7 +75,7 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Notificação foi ligada.")
 
     for job in jobs:
-        print(f"Job ID: {job.id}, Next Run Time: {job.next_run_time}")
+        print(f"Job ID: {job.id}, próxima run: {job.next_run_time}")
 
 def dataCorrida(data_corrida):
     data_corrida_datetime = datetime.strptime(data_corrida, "%Y-%m-%d %H:%M:%SZ").replace(tzinfo=pytz.UTC)
@@ -91,9 +90,10 @@ def pega_round():
     data = cache.get(url)
     
     if data is not None:
-        print('Usando cache')
+        print('~ Usando cache ~')
     else:
         response = requests.get(url)
+        print('~ Usando API ~')
         if response.status_code == 200:
             data = response.json()
             cache.set(url, data, expire=10*24*60*60)
