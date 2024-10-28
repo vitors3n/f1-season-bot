@@ -21,11 +21,8 @@ logging.basicConfig(
 )
 
 url = "https://api.jolpi.ca/ergast/f1/2024/21.json"
-
 cache = Cache('jolpi_cache')
-
 logger = logging.getLogger(__name__)
-
 bot = Bot(token=BOT_TOKEN)
 
 def adiciona_lembrete(scheduler, data_completa, update):
@@ -102,7 +99,6 @@ def pega_round():
             break
 
     round_atual = Corrida(round_numero)
-
     return round_atual
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -111,22 +107,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def proxima(update: Update, context: ContextTypes.DEFAULT_TYPE):
     round_atual = pega_round()
 
-    message = (
-        f"<b>{ round_atual.granprix }</b>\n"
-        f"{ round_atual.circuito }\n\n"
-    )   
+    message = f"<b>{ round_atual.granprix }</b>\n"
+    message += f"{ round_atual.circuito }\n\n"
+    message += f"<b>FP1:</b> { round_atual.fp1.dia_hora() }\n\n"
 
-    message+= f"<b>FP1:</b> { round_atual.fp1.dia_hora() }\n\n"
-    if round_atual.fp2:
-        message+= f"<b>FP2:</b> { round_atual.fp2.dia_hora() }\n\n"
-    if round_atual.fp3:
-        message+= f"<b>FP3:</b> { round_atual.fp3.dia_hora() }\n\n"
-    if round_atual.sprint_quali:
-        message+= f"<b>SprintQuali:</b> { round_atual.sprint_quali.dia_hora() }\n\n"
-        message+= f"<b>Sprint:</b> { round_atual.sprint.dia_hora() }\n\n"
-    message+= f"<b>Quali:</b> { round_atual.quali.dia_hora() }\n\n"
+    if round_atual.sprint:
+        message += f"<b>SprintQuali:</b> { round_atual.sprint_quali.dia_hora() }\n\n"
+        message += f"<b>Sprint:</b> { round_atual.sprint.dia_hora() }\n\n"
+    if not round_atual.sprint:
+        message += f"<b>FP2:</b> { round_atual.fp2.dia_hora() }\n\n"
+        message += f"<b>FP3:</b> { round_atual.fp3.dia_hora() }\n\n"
 
-    message+= f"<b>Corrida:</b> { round_atual.dia_hora() }"
+    message += f"<b>Quali:</b> { round_atual.quali.dia_hora() }\n\n"
+    message += f"<b>Corrida:</b> { round_atual.dia_hora() }"
 
     await update.message.reply_text(message, parse_mode='HTML')
 
