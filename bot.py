@@ -1,5 +1,8 @@
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.jobstores.base import ConflictingIdError
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+
 from datetime import datetime, timedelta
 from models.corrida import Corrida
 from dotenv import load_dotenv
@@ -14,6 +17,13 @@ import os
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
+lembretes = {
+    'default': SQLAlchemyJobStore(url='sqlite:///lembretes.sqlite')
+}
+
+scheduler = AsyncIOScheduler(jobstores=lembretes)
+scheduler.start()
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
@@ -23,21 +33,33 @@ cache = Cache('jolpi_cache')
 logger = logging.getLogger(__name__)
 bot = Bot(token=BOT_TOKEN)
 
-def adiciona_lembrete(scheduler, data_evento, update):
+def adiciona_lembrete(evento, update):
     chat_id = update.message.chat.id
     msg_thread_id = update.message.message_thread_id
-    lembrete_10_minutos = data_evento - timedelta(minutes=10)
-    lembrete_5_minutos = data_evento - timedelta(minutes=5)
-    scheduler.add_job(enviar_lembrete, 'date', run_date=lembrete_10_minutos, args=[update, chat_id, msg_thread_id, 10])
-    scheduler.add_job(enviar_lembrete, 'date', run_date=lembrete_5_minutos, args=[update, chat_id, msg_thread_id, 5])
+    lembrete_10_minutos = evento.dia_hora_datetime() - timedelta(minutes=10)
+    lembrete_5_minutos = evento.dia_hora_datetime() - timedelta(minutes=5)
+
+    scheduler.add_job(
+        enviar_lembrete,
+        'date',
+        run_date=lembrete_10_minutos,
+        args=[update, chat_id, msg_thread_id, 10 ],
+        id=f'{evento.nome}_{evento.dia_hora()}_10min'
+    )
+
+    scheduler.add_job(
+        enviar_lembrete,
+        'date',
+        run_date=lembrete_5_minutos,
+        args=[update, chat_id, msg_thread_id, 5],
+        id=f'{evento.nome}_{evento.dia_hora()}_5min'
+    )
 
 async def enviar_lembrete(update, chat_id, message_thread_id, minutes_before):
     print(f"Lembrete: {minutes_before} minutos para o próximo evento começar")
     await bot.send_message(chat_id=chat_id, text=f"Lembrete: {minutes_before} minutos para o próximo evento começar", reply_to_message_id=message_thread_id)
 
 async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    scheduler = AsyncIOScheduler()
     jobs = scheduler.get_jobs()
 
     corrida = pega_corrida()
@@ -52,13 +74,19 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lista_eventos.append(corrida.fp3)
 
     for evento in lista_eventos:
-        adiciona_lembrete(scheduler, evento.dia_hora_datetime(), update)
-
-    scheduler.start()
+        try:
+            adiciona_lembrete(evento, update)
+        except ConflictingIdError:
+            print('Job já existe... Ignorando...')
     await update.message.reply_text("Notificação foi ligada.")
 
     for job in jobs:
         print(f"Job ID: {job.id}, próxima run: {job.next_run_time}")
+
+async def clear_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    scheduler.remove_all_jobs()
+    print("Todos os jobs foram apagados, jobs: ", scheduler.get_jobs())
+    await update.message.reply_text("As notificações foram apagadas")
 
 def corrida_passou(data_corrida):
     data_corrida_datetime = datetime.strptime(data_corrida, "%Y-%m-%d %H:%M:%SZ").replace(tzinfo=pytz.UTC)
@@ -122,6 +150,7 @@ def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("next", next))
     application.add_handler(CommandHandler("notify", notify))
+    application.add_handler(CommandHandler("clearnotify", clear_notify))
     application.run_polling()
 
 if __name__ == "__main__":
