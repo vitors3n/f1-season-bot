@@ -4,7 +4,6 @@ from comandos.notify import notify
 from comandos.next import next
 from dotenv import load_dotenv
 from telegram import Update
-from telegram import Bot
 import logging
 import os
 
@@ -16,7 +15,6 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-bot = Bot(token=BOT_TOKEN)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Hello")

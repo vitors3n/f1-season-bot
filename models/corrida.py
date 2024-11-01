@@ -1,7 +1,6 @@
 from datetime import datetime
 import pytz
 
-
 def corrigirTimeZone(dia, hora):
     dia_hora_string = f"{dia} {hora}"
     dia_hora_utc = datetime.strptime(dia_hora_string, "%Y-%m-%d %H:%M:%SZ").replace(tzinfo=pytz.UTC)
@@ -26,11 +25,13 @@ class Evento:
         return dia_hora_dt
 
 class DiaEvento(Evento):
+
     def __init__(self, nome, evento_json):
         super().__init__(evento_json['date'], evento_json['time'])
         self.nome = nome
 
 class Corrida(Evento):
+
     def __init__(self, corrida_json):
         super().__init__(corrida_json['date'], corrida_json['time'])
         self.granprix = corrida_json['raceName']
