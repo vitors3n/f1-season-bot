@@ -4,6 +4,7 @@ from comandos.notify import notify
 from comandos.next import next
 from dotenv import load_dotenv
 from telegram import Update
+from telegram import Bot
 import logging
 import os
 
