@@ -19,12 +19,10 @@ lembretes = {
 }
 
 scheduler = AsyncIOScheduler(jobstores=lembretes)
-print('Iniciando Scheduler...')
 scheduler.start()
 
-async def enviar_lembrete(chat_id, thread_id, minutos):
-    print(f"Lembrete: {minutos} minutos para o próximo evento começar")
-    await bot.send_message(chat_id=chat_id, text=f"Lembrete: {minutos} minutos para o próximo evento começar", reply_to_message_id=thread_id)
+async def enviar_lembrete(chat_id, thread_id, evento_nome, minutos):
+    await bot.send_message(chat_id=chat_id, text=f"{evento_nome} começa em {minutos} minuto!", reply_to_message_id=thread_id)
 
 def adiciona_lembrete(chat_id, thread_id, evento):
     lembrete_10_minutos = evento.dia_hora_datetime() - timedelta(minutes=10)
@@ -34,7 +32,7 @@ def adiciona_lembrete(chat_id, thread_id, evento):
         enviar_lembrete,
         'date',
         run_date=lembrete_10_minutos,
-        args=[chat_id, thread_id, 10 ],
+        args=[chat_id, thread_id, evento.nome, 10 ],
         id=f'{evento.nome}_{evento.dia_hora()}_10min{chat_id}'
     )
 
@@ -42,7 +40,7 @@ def adiciona_lembrete(chat_id, thread_id, evento):
         enviar_lembrete,
         'date',
         run_date=lembrete_5_minutos,
-        args=[chat_id, thread_id, 5],
+        args=[chat_id, thread_id, evento.nome, 5],
         id=f'{evento.nome}_{evento.dia_hora()}_5min{chat_id}'
     )
 
