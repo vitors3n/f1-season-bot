@@ -33,7 +33,8 @@ def adiciona_lembrete(chat_id, thread_id, evento):
         'date',
         run_date=lembrete_10_minutos,
         args=[chat_id, thread_id, evento.nome, 10 ],
-        id=f'{evento.nome}_{evento.dia_hora()}_10min{chat_id}'
+        id=f'{evento.nome}_{evento.dia_hora()}_10min{chat_id}',
+        misfire_grace_time=20
     )
 
     scheduler.add_job(
@@ -41,7 +42,8 @@ def adiciona_lembrete(chat_id, thread_id, evento):
         'date',
         run_date=lembrete_5_minutos,
         args=[chat_id, thread_id, evento.nome, 5],
-        id=f'{evento.nome}_{evento.dia_hora()}_5min{chat_id}'
+        id=f'{evento.nome}_{evento.dia_hora()}_5min{chat_id}',
+        misfire_grace_time=20
     )
 
 async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
