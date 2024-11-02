@@ -37,20 +37,18 @@ class Corrida(Evento):
         self.granprix = corrida_json['raceName']
         self.nome = self.granprix
         self.circuito = corrida_json['Circuit']['circuitName']
-        self.fp1 = DiaEvento('FirstPractice', corrida_json['FirstPractice'])
+        self.fp1 = DiaEvento('Treino Livre 1', corrida_json['FirstPractice'])
         self.fp2 = None
         self.fp3 = None
         self.sprint = None
         self.sprint_quali = None
         
-        if "SecondPractice" in corrida_json:
-            self.fp2 = DiaEvento('SecondPractice', corrida_json['SecondPractice'])
-        
-        if "ThirdPractice" in corrida_json:
-            self.fp3 = DiaEvento('ThirdPractice', corrida_json['ThirdPractice'])
+        if "Sprint" not in corrida_json:
+            self.fp2 = DiaEvento('Treino Livre 2', corrida_json['SecondPractice'])
+            self.fp3 = DiaEvento('Treino Livre 3', corrida_json['ThirdPractice'])
 
-        if "SprintQualifying" in corrida_json:
-            self.sprint_quali = DiaEvento('SprintQualifying', corrida_json['SprintQualifying'])
+        if "Sprint" in corrida_json:
+            self.sprint_quali = DiaEvento('Qualificação Sprint', corrida_json['SprintQualifying'])
             self.sprint = DiaEvento('Sprint', corrida_json['Sprint'])
         
-        self.quali = DiaEvento('Qualifying', corrida_json['Qualifying'])
+        self.quali = DiaEvento('Qualificação', corrida_json['Qualifying'])
