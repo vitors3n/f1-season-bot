@@ -3,7 +3,7 @@ from models.corrida import Corrida
 from diskcache import Cache
 import requests
 
-url = "https://api.jolpi.ca/ergast/f1/2024/21.json"
+url = "https://api.jolpi.ca/ergast/f1/2024/"
 cache = Cache('jolpi_cache')
 
 def pega_corrida():
@@ -21,7 +21,7 @@ def pega_corrida():
     corridas = data['MRData']['RaceTable']['Races']
 
     proxima_corrida_json = ''
-
+ 
     for corrida in corridas:
         if not corrida_passou(f"{corrida['date']} {corrida['time']}"):
             proxima_corrida_json = corrida
