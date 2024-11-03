@@ -23,9 +23,7 @@ def pega_corrida():
     proxima_corrida_json = ''
 
     for corrida in corridas:
-        if corrida_passou(f"{corrida['date']} {corrida['time']}"):
-            pass
-        else:
+        if not corrida_passou(f"{corrida['date']} {corrida['time']}"):
             proxima_corrida_json = corrida
             break
 

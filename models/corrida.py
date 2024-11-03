@@ -1,7 +1,7 @@
 from datetime import datetime
 import pytz
 
-def corrigirTimeZone(dia, hora):
+def corrigir_timezone(dia, hora):
     dia_hora_string = f"{dia} {hora}"
     dia_hora_utc = datetime.strptime(dia_hora_string, "%Y-%m-%d %H:%M:%SZ").replace(tzinfo=pytz.UTC)
     dia_hora_local = dia_hora_utc.astimezone(pytz.timezone("America/Sao_Paulo"))
@@ -14,12 +14,12 @@ class Evento:
         self.hora = hora
     
     def dia_hora(self):
-        dia_hora_local = corrigirTimeZone(self.dia, self.hora)
+        dia_hora_local = corrigir_timezone(self.dia, self.hora)
         dia_hora_local = dia_hora_local.strftime("%d/%m/%Y, %H:%M")
         return dia_hora_local
     
     def dia_hora_datetime(self):
-        dia_hora = corrigirTimeZone(self.dia, self.hora)
+        dia_hora = corrigir_timezone(self.dia, self.hora)
         dia_hora = dia_hora.strftime("%Y-%m-%d %H:%M:%S")
         dia_hora_dt = datetime.strptime(dia_hora,"%Y-%m-%d %H:%M:%S")
         return dia_hora_dt
