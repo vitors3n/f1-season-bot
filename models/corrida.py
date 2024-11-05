@@ -34,8 +34,7 @@ class Corrida(Evento):
 
     def __init__(self, corrida_json):
         super().__init__(corrida_json['date'], corrida_json['time'])
-        self.granprix = corrida_json['raceName']
-        self.nome = self.granprix
+        self.nome = corrida_json['raceName']
         self.circuito = corrida_json['Circuit']['circuitName']
         self.fp1 = DiaEvento('Treino Livre 1', corrida_json['FirstPractice'])
         self.fp2 = None
