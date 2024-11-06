@@ -1,5 +1,5 @@
 from utils.corrida_passou import corrida_passou
-from models.corrida import Corrida
+from modelos.corrida import Corrida
 from diskcache import Cache
 import requests
 

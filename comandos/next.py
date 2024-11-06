@@ -5,7 +5,7 @@ from telegram import Update
 async def next(update: Update, context: ContextTypes.DEFAULT_TYPE):
     corrida = pega_corrida()
 
-    message = f"<b>{ corrida.granprix }</b>\n"
+    message = f"<b>{ corrida.nome }</b>\n"
     message += f"{ corrida.circuito }\n\n"
     message += f"<b>FP1:</b> { corrida.fp1.dia_hora() }\n\n"
 
