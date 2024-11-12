@@ -3,6 +3,7 @@ from comandos.notify import clear_notify
 from comandos.notify import notify
 from comandos.next import next
 from comandos.drivers import drivers
+from comandos.teams import teams
 from dotenv import load_dotenv
 from telegram import Update
 import logging
@@ -27,6 +28,7 @@ def main():
     application.add_handler(CommandHandler("notify", notify))
     application.add_handler(CommandHandler("clearnotify", clear_notify))
     application.add_handler(CommandHandler("drivers", drivers))
+    application.add_handler(CommandHandler("teams", teams))
     application.run_polling()
 
 if __name__ == "__main__":
