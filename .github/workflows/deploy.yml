@@ -13,17 +13,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          path: ~/f1-bot
       
       - name: Cria .env
         run: |
           echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
-        working-directory: ~/f1-bot
 
       - name: Instala dependencias
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
-        working-directory: ~/f1-bot
