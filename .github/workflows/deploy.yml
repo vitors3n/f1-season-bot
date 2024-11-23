@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, apolo]
+    runs-on: [self-hosted, apolo-runner]
 
     steps:
       - name: Checkout repository
