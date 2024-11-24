@@ -14,7 +14,7 @@ def campeonato_pilotos():
         print('~ Usando API ~')
         if response.status_code == 200:
             data = response.json()
-            cache.set(url, data, expire=10*24*60*60)
+            cache.set(url, data, expire=30*60)
 
     corredores = data['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']
 
