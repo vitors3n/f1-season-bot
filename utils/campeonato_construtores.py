@@ -1,10 +1,12 @@
 from diskcache import Cache
+from datetime import datetime
 import requests
 
-url = "https://api.jolpi.ca/ergast/f1/2024/constructorstandings/"
 cache = Cache('jolpi_cache')
 
 def campeonato_construtores():
+    ano_atual = datetime.now().year
+    url = f"https://api.jolpi.ca/ergast/f1/{ano_atual}/constructorstandings/"
     data = cache.get(url)
     
     if data is not None:

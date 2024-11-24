@@ -1,12 +1,14 @@
 from utils.corrida_passou import corrida_passou
 from modelos.corrida import Corrida
+from datetime import datetime
 from diskcache import Cache
 import requests
 
-url = "https://api.jolpi.ca/ergast/f1/2024/"
 cache = Cache('jolpi_cache')
 
 def pega_corrida():
+    ano_atual = datetime.now().year
+    url = f"https://api.jolpi.ca/ergast/f1/{ano_atual}/"
     data = cache.get(url)
     
     if data is not None:
