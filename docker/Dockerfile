@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./comandos /comandos
 COPY ./modelos /modelos
 COPY ./utils /utils
-COPY ./bot.py /
+COPY ./bot.py bot.py
 
 USER f1bot
 
