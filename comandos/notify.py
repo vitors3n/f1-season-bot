@@ -15,7 +15,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = Bot(token=BOT_TOKEN)
 
 lembretes = {
-    'default': SQLAlchemyJobStore(url='sqlite:///lembretes.sqlite')
+    'default': SQLAlchemyJobStore(url='sqlite:///data/lembretes.sqlite')
 }
 
 scheduler = AsyncIOScheduler(jobstores=lembretes)

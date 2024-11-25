@@ -7,19 +7,25 @@ on:
   workflow_dispatch:
 
 jobs:
+  build:
+    runs-on: [self-hosted, apolo-runner]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build f1bot docker image
+        run: |
+          docker-compose -f docker/docker-compose.yml build --no-cache
+
   deploy:
     runs-on: [self-hosted, apolo-runner]
-
+    needs: build
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
-      - name: Cria .env
+      - name: create .env
         run: |
           echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
 
-      - name: Instala dependencias
+      - name: Deploy f1bot
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
+          docker-compose -f docker/docker-compose.yml down
+          docker-compose -f docker/docker-compose.yml --env-file .env up -d

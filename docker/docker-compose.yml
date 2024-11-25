@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  f1bot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: f1bot
+    restart: always
+    volumes:
+      - /projetos/f1bot/data:/usr/src/f1-bot/data
+    command: python bot.py
