@@ -7,4 +7,5 @@ services:
     restart: always
     volumes:
       - /projetos/f1bot/data:/usr/src/f1-bot/data
+      - /projetos/f1bot/jolpi_cache:/usr/src/f1-bot/jolpi_cache
     command: python bot.py
