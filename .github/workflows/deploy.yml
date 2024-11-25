@@ -15,7 +15,7 @@ jobs:
 
       - name: Build f1bot docker image
         run: |
-          docker-compose -f docker/docker-compose.yml build --no-cache
+          docker compose -f docker/docker-compose.yml build --no-cache
 
   deploy:
     runs-on: [self-hosted, apolo-runner]
@@ -27,5 +27,5 @@ jobs:
 
       - name: Deploy f1bot
         run: |
-          docker-compose -f docker/docker-compose.yml down
-          docker-compose -f docker/docker-compose.yml --env-file .env up -d
+          docker compose -f docker/docker-compose.yml down
+          docker compose -f docker/docker-compose.yml --env-file .env up -d
