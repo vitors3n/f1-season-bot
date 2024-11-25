@@ -11,8 +11,6 @@ COPY modelos /usr/src/f1-bot/modelos
 COPY utils /usr/src/f1-bot/utils
 COPY bot.py /usr/src/f1-bot/
 
-RUN chmod o+w /usr/src/f1-bot/data && chmod o+w /usr/src/f1-bot/jolpi_cache
-
 USER f1bot
 
 CMD ["python", "bot.py"]
