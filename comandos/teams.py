@@ -7,7 +7,7 @@ async def teams(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     message = "<b>Campeonato de Construtores</b>\n"
     for time in times:
-        nome_time = f'{ time['Constructor']['name'] } '
+        nome_time = f"{ time['Constructor']['name'] } "
         message += f"{ time['position'] } - { nome_time } - { time['points'] }\n"
 
     await update.message.reply_text(message, parse_mode='HTML')

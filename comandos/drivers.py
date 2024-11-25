@@ -7,7 +7,7 @@ async def drivers(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     message = "<b>Campeonato de Pilotos</b>\n"
     for piloto in pilotos:
-        nome_completo = f'{ piloto['Driver']['givenName'] } { piloto['Driver']['familyName'] }'
+        nome_completo = f"{ piloto['Driver']['givenName'] } { piloto['Driver']['familyName'] }"
         message += f"{ piloto['position'] } - { nome_completo } - { piloto['points'] }\n"
 
     await update.message.reply_text(message, parse_mode='HTML')
