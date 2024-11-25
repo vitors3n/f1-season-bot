@@ -15,7 +15,7 @@ jobs:
 
       - name: Build f1bot docker image
         run: |
-          whoami
+          newgrp docker
           docker compose -f docker/docker-compose.yml build --no-cache
 
   deploy:
