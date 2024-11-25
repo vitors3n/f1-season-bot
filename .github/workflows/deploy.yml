@@ -28,4 +28,4 @@ jobs:
       - name: Deploy f1bot
         run: |
           docker compose -f docker/docker-compose.yml down
-          docker compose -f docker/docker-compose.yml --env-file .env up -d
+          docker compose -f docker/docker-compose.yml --env-file ../.env up -d
