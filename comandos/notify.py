@@ -77,3 +77,11 @@ async def clear_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     scheduler.remove_all_jobs()
     print("Todos os jobs foram apagados, jobs: ", scheduler.get_jobs())
     await update.message.reply_text("As notificações foram apagadas")
+
+async def listnotify(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    jobs = scheduler.get_jobs()
+    message = "<b>Notificações Ligadas</b>\n"
+    for job in jobs:
+        message += f"{ job.id } - { job.next_run_time } \n"
+
+    await update.message.reply_text(message, parse_mode='HTML')

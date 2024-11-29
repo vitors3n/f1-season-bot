@@ -1,6 +1,6 @@
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from comandos.notify import clear_notify
-from comandos.notify import notify
+from comandos.notify import notify, listnotify
 from comandos.next import next
 from comandos.drivers import drivers
 from comandos.teams import teams
@@ -26,6 +26,7 @@ def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("next", next))
     application.add_handler(CommandHandler("notify", notify))
+    application.add_handler(CommandHandler("listnotify", listnotify))
     application.add_handler(CommandHandler("clearnotify", clear_notify))
     application.add_handler(CommandHandler("drivers", drivers))
     application.add_handler(CommandHandler("teams", teams))
