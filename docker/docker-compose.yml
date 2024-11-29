@@ -7,6 +7,7 @@ services:
     restart: always
     environment:
       BOT_TOKEN: $BOT_TOKEN
+      TZ: America/Sao_Paulo
     volumes:
       - /projetos/f1bot/data:/usr/src/f1-bot/data
       - /projetos/f1bot/jolpi_cache:/usr/src/f1-bot/jolpi_cache
