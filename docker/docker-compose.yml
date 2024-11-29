@@ -10,4 +10,6 @@ services:
     volumes:
       - /projetos/f1bot/data:/usr/src/f1-bot/data
       - /projetos/f1bot/jolpi_cache:/usr/src/f1-bot/jolpi_cache
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     command: python bot.py
