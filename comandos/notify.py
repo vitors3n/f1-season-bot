@@ -82,6 +82,6 @@ async def listnotify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     jobs = scheduler.get_jobs()
     message = "<b>Notificações Ligadas</b>\n"
     for job in jobs:
-        message += f"{ job.id } - { job.next_run_time } \n"
+        message += f"{ job.id } \n"
 
     await update.message.reply_text(message, parse_mode='HTML')
