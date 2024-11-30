@@ -80,8 +80,12 @@ async def clear_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def listnotify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     jobs = scheduler.get_jobs()
-    message = "<b>Notificações Ligadas</b>\n"
+    message = "<b>Lista de notificações ligadas:</b>\n"
+
     for job in jobs:
         message += f"{ job.id } \n"
+
+    if len(jobs) == 0:
+        message += "Sem notificações."
 
     await update.message.reply_text(message, parse_mode='HTML')

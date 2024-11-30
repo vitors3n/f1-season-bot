@@ -9,6 +9,7 @@ cache = Cache('jolpi_cache')
 def pega_corrida():
     ano_atual = datetime.now().year
     url = f"https://api.jolpi.ca/ergast/f1/{ano_atual}/"
+    # nova_url = https://api.jolpi.ca/ergast/f1/current/next.json
     data = cache.get(url)
     
     if data is not None:
