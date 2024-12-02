@@ -83,11 +83,15 @@ async def clear_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Não autorizado.")
 
 async def listnotify(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.message.chat.id
     jobs = scheduler.get_jobs()
     message = "<b>Lista de notificações ligadas:</b>\n"
 
     for job in jobs:
-        message += f"{ job.id } \n"
+        if str(chat_id) in job.id:
+            readable_job_id = job.id.replace("_"," ")
+            readable_job_id = readable_job_id.replace(str(chat_id), "")
+            message += f"{ readable_job_id } \n"
 
     if len(jobs) == 0:
         message += "Sem notificações."
