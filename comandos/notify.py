@@ -74,9 +74,13 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Job ID: {job.id}, próxima run: {job.next_run_time}")
 
 async def clear_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    scheduler.remove_all_jobs()
-    print("Todos os jobs foram apagados, jobs: ", scheduler.get_jobs())
-    await update.message.reply_text("As notificações foram apagadas")
+    user_id = update.effective_user.id
+    if user_id == 101343650:
+        scheduler.remove_all_jobs()
+        print("Todos os jobs foram apagados, jobs: ", scheduler.get_jobs())
+        await update.message.reply_text("As notificações foram apagadas")
+    else:
+        await update.message.reply_text("Não autorizado.")
 
 async def listnotify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     jobs = scheduler.get_jobs()
