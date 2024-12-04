@@ -19,7 +19,7 @@ def pega_corrida():
         print('~ Usando API ~')
         if response.status_code == 200:
             data = response.json()
-            cache.set(url, data, expire=10*24*60*60)
+            cache.set(url, data, expire=12*60*60)
 
     corridas = data['MRData']['RaceTable']['Races']
 
