@@ -7,9 +7,7 @@ import requests
 cache = Cache('jolpi_cache')
 
 def pega_corrida():
-    ano_atual = datetime.now().year
-    url = f"https://api.jolpi.ca/ergast/f1/{ano_atual}/"
-    # nova_url = https://api.jolpi.ca/ergast/f1/current/next.json
+    url = "https://api.jolpi.ca/ergast/f1/current/next.json"
     data = cache.get(url)
     
     if data is not None:
@@ -21,14 +19,5 @@ def pega_corrida():
             data = response.json()
             cache.set(url, data, expire=12*60*60)
 
-    corridas = data['MRData']['RaceTable']['Races']
-
-    proxima_corrida_json = ''
- 
-    for corrida in corridas:
-        if not corrida_passou(f"{corrida['date']} {corrida['time']}"):
-            proxima_corrida_json = corrida
-            break
-
-    proxima_corrida = Corrida(proxima_corrida_json)
+    proxima_corrida = Corrida(data)
     return proxima_corrida
