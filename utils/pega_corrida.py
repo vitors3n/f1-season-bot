@@ -19,5 +19,7 @@ def pega_corrida():
             data = response.json()
             cache.set(url, data, expire=12*60*60)
 
-    proxima_corrida = Corrida(data)
+    corrida = data['MRData']['RaceTable']['Races'][0]
+
+    proxima_corrida = Corrida(corrida)
     return proxima_corrida
