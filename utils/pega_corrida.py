@@ -1,6 +1,4 @@
-from utils.corrida_passou import corrida_passou
 from modelos.corrida import Corrida
-from datetime import datetime
 from diskcache import Cache
 import requests
 
