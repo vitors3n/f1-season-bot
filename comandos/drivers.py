@@ -5,6 +5,7 @@ from telegram import Update
 async def drivers(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pilotos = campeonato_pilotos()
 
+    print(pilotos)
     message = "<b>Campeonato de Pilotos</b>\n"
     for piloto in pilotos:
         nome_completo = f"{ piloto['Driver']['givenName'] } { piloto['Driver']['familyName'] }"
