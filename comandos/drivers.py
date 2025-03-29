@@ -1,12 +1,13 @@
 from utils.campeonato_pilotos import campeonato_pilotos
 from telegram.ext import ContextTypes
+from datetime import datetime
 from telegram import Update
 
 async def drivers(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pilotos = campeonato_pilotos()
-
+    ano_atual = datetime.now().year
     print(pilotos)
-    message = "<b>Campeonato de Pilotos</b>\n"
+    message = f"<b>Campeonato de Pilotos - {ano_atual}</b>\n"
 
     ind = 1
     #piloto['position']
