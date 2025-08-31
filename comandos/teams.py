@@ -1,9 +1,14 @@
 from utils.campeonato_construtores import campeonato_construtores
 from telegram.ext import ContextTypes
 from telegram import Update
+from datetime import datetime
 
 async def teams(update: Update, context: ContextTypes.DEFAULT_TYPE):
     times = campeonato_construtores()
+
+    if times is None:
+        await update.message.reply_text("Não foi possível consultar os dados.", parse_mode='HTML')
+    
     ano_atual = datetime.now().year
 
     message = f"<b>Campeonato de Construtores - {ano_atual}</b>\n"

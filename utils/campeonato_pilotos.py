@@ -18,6 +18,10 @@ def campeonato_pilotos():
             data = response.json()
             cache.set(url, data, expire=30*60)
 
+    # Bloco para quando não for possível acessar a API e não existir cache
+    if data is None:
+        return None
+
     corredores = data['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']
 
     return corredores

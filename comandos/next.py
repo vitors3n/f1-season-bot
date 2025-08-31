@@ -5,6 +5,9 @@ from telegram import Update
 async def next(update: Update, context: ContextTypes.DEFAULT_TYPE):
     corrida = pega_corrida()
 
+    if corrida is None:
+        await update.message.reply_text("Não foi possível consultar os dados.", parse_mode='HTML')
+
     message = f"<b>{ corrida.nome }</b>\n"
     message += f"{ corrida.circuito }\n\n"
     message += f"<b>FP1:</b> { corrida.fp1.dia_hora() }\n\n"

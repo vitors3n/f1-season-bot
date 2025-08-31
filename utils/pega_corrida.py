@@ -17,6 +17,10 @@ def pega_corrida():
             data = response.json()
             cache.set(url, data, expire=12*60*60)
 
+    # Bloco para quando não for possível acessar a API e não existir cache
+    if data is None:
+        return None
+
     corrida = data['MRData']['RaceTable']['Races'][0]
 
     proxima_corrida = Corrida(corrida)

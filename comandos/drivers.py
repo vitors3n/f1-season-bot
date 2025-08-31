@@ -5,6 +5,10 @@ from telegram import Update
 
 async def drivers(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pilotos = campeonato_pilotos()
+    
+    if pilotos is None:
+        await update.message.reply_text("Não foi possível consultar os dados.", parse_mode='HTML')
+
     ano_atual = datetime.now().year
     print(pilotos)
     message = f"<b>Campeonato de Pilotos - {ano_atual}</b>\n"

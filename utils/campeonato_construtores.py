@@ -17,6 +17,10 @@ def campeonato_construtores():
         if response.status_code == 200:
             data = response.json()
             cache.set(url, data, expire=30*60)
+    
+    # Bloco para quando não for possível acessar a API e não existir cache
+    if data is None:
+        return None
 
     times = data['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings']
 
