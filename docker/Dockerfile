@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY comandos /usr/src/f1-bot/comandos
 COPY modelos /usr/src/f1-bot/modelos
-COPY utils /usr/src/f1-bot/utils
+COPY servicos /usr/src/f1-bot/servicos
 COPY bot.py /usr/src/f1-bot/
 
 USER f1bot

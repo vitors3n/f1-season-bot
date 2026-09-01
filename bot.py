@@ -4,6 +4,7 @@ from comandos.notify import notify, listnotify
 from comandos.next import next
 from comandos.drivers import drivers
 from comandos.teams import teams
+from comandos.mensagens import MENSAGEM_INICIAL
 from dotenv import load_dotenv
 from telegram import Update
 import logging
@@ -19,7 +20,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Hello")
+    await update.message.reply_text(MENSAGEM_INICIAL, parse_mode='HTML')
 
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()

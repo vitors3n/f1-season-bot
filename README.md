@@ -79,7 +79,7 @@ O bot iniciará e começará a enviar notificações conforme as configurações
 ├── requirements.txt # Dependências do Python
 ├── comandos/ # Scripts ou módulos de comandos F1
 ├── modelos/ # Modelos de dados (ex: classes ou schemas)
-├── utils/ # Funções e utilitários
+├── servicos/ # Integração com APIs externas e cache
 ├── docker/ # Configurações para execução via Docker
 ├── .github/workflows/ # Pipelines (CI/CD, SonarCloud, etc.)
 └── README.md # Este documento
