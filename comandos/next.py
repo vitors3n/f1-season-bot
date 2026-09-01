@@ -1,4 +1,4 @@
-from utils.pega_corrida import pega_corrida
+from servicos.pega_corrida import pega_corrida
 from telegram.ext import ContextTypes
 from telegram import Update
 

@@ -1,4 +1,4 @@
-from utils.campeonato_pilotos import campeonato_pilotos
+from servicos.campeonato_pilotos import campeonato_pilotos
 from telegram.ext import ContextTypes
 from datetime import datetime
 from telegram import Update
