@@ -4,7 +4,6 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from servicos.pega_corrida import pega_corrida
 from comandos.mensagens import (
     ERRO_CONSULTA,
-    NAO_AUTORIZADO,
     NOTIFICACOES_REMOVIDAS,
     lembrete,
     lista_notificacoes,
@@ -95,13 +94,13 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Job ID: {job.id}, próxima run: {job.next_run_time}")
 
 async def clear_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    if user_id == 101343650:
-        scheduler.remove_all_jobs()
-        print("Todos os jobs foram apagados, jobs: ", scheduler.get_jobs())
-        await update.message.reply_text(NOTIFICACOES_REMOVIDAS)
-    else:
-        await update.message.reply_text(NAO_AUTORIZADO)
+    chat_id = update.effective_chat.id
+
+    for job in scheduler.get_jobs():
+        if job.args and job.args[0] == chat_id:
+            job.remove()
+
+    await update.message.reply_text(NOTIFICACOES_REMOVIDAS)
 
 async def listnotify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat.id
