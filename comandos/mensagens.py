@@ -1,4 +1,7 @@
+from datetime import datetime
 from html import escape
+
+from modelos.corrida import corrigir_timezone
 
 
 MENSAGEM_INICIAL = """🏎️ <b>Bem-vindo ao F1 Season Bot!</b>
@@ -7,6 +10,7 @@ Acompanhe a temporada de Fórmula 1 diretamente pelo Telegram.
 
 <b>Comandos disponíveis:</b>
 /next — Próxima corrida e horários
+/calendar — Calendário da temporada
 /drivers — Classificação dos pilotos
 /teams — Classificação dos construtores
 /notify — Ativar lembretes da próxima corrida
@@ -43,6 +47,38 @@ def proxima_corrida(corrida):
         f"📍 {escape(corrida.circuito)}\n\n"
         f"<b>Programação:</b>\n{programacao_formatada}"
     )
+
+
+def calendario_temporada(corridas, ano):
+    dias_da_semana = (
+        "segunda-feira",
+        "terça-feira",
+        "quarta-feira",
+        "quinta-feira",
+        "sexta-feira",
+        "sábado",
+        "domingo",
+    )
+    linhas = [f"🗓 <b>Calendário da Fórmula 1 — {ano}</b>", ""]
+
+    for corrida in corridas:
+        nome = escape(corrida["raceName"])
+        if corrida.get("time"):
+            dia_hora = corrigir_timezone(corrida["date"], corrida["time"])
+            dia_da_semana = dias_da_semana[dia_hora.weekday()]
+            data_formatada = dia_hora.strftime("%d/%m às %H:%M")
+        else:
+            dia = datetime.strptime(corrida["date"], "%Y-%m-%d")
+            dia_da_semana = dias_da_semana[dia.weekday()]
+            data_formatada = f'{dia.strftime("%d/%m")} (horário a definir)'
+
+        linhas.append(
+            f'<b>{corrida["round"]}. {nome}</b> — '
+            f"{dia_da_semana}, {data_formatada}"
+        )
+
+    linhas.extend(["", "🕒 Horários de Fortaleza (CE)"])
+    return "\n".join(linhas)
 
 
 def classificacao_pilotos(pilotos, ano):

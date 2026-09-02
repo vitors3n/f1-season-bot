@@ -2,6 +2,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from comandos.notify import clear_notify
 from comandos.notify import notify, listnotify
 from comandos.next import next
+from comandos.calendar import calendar
 from comandos.drivers import drivers
 from comandos.teams import teams
 from comandos.mensagens import MENSAGEM_INICIAL
@@ -26,6 +27,7 @@ def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("next", next))
+    application.add_handler(CommandHandler("calendar", calendar))
     application.add_handler(CommandHandler("notify", notify))
     application.add_handler(CommandHandler("listnotify", listnotify))
     application.add_handler(CommandHandler("clearnotify", clear_notify))
