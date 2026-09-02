@@ -15,6 +15,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 from telegram import Update
 from telegram import Bot
+from modelos.corrida import TIMEZONE_FORTALEZA
 import os
 
 load_dotenv()
@@ -26,7 +27,7 @@ lembretes = {
     'default': SQLAlchemyJobStore(url='sqlite:///data/lembretes.sqlite')
 }
 
-scheduler = AsyncIOScheduler(jobstores=lembretes)
+scheduler = AsyncIOScheduler(jobstores=lembretes, timezone=TIMEZONE_FORTALEZA)
 scheduler.start()
 
 async def enviar_lembrete(chat_id, thread_id, evento_nome, minutos):
