@@ -15,7 +15,18 @@ Acompanhe a temporada de Fórmula 1 diretamente pelo Telegram.
 /drivers — Classificação dos pilotos
 /teams — Classificação dos construtores
 /notify — Ativar lembretes da próxima corrida
-/listnotify — Consultar lembretes ativos"""
+/listnotify — Consultar lembretes ativos
+/about — Sobre o bot"""
+
+SOBRE_O_BOT = """🏎️ <b>Sobre o F1 Season Bot</b>
+
+Este bot ajuda você a acompanhar a temporada de Fórmula 1 pelo Telegram, com calendário, classificação, programação, contagem regressiva e lembretes das sessões.
+
+🕒 Todos os horários são exibidos no fuso de Fortaleza (CE).
+📊 Os dados são fornecidos pela <a href="https://jolpi.ca/">Jolpica F1 API</a>.
+💻 Projeto desenvolvido em Python com código disponível no <a href="https://github.com/vitors3n/f1-season-bot">GitHub</a>.
+
+Este é um projeto independente e não possui vínculo oficial com a Fórmula 1."""
 
 ERRO_CONSULTA = "⚠️ Não foi possível consultar os dados da Fórmula 1 agora. Tente novamente mais tarde."
 NAO_AUTORIZADO = "⛔ Você não tem permissão para executar este comando."

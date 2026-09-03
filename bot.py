@@ -4,6 +4,7 @@ from comandos.notify import notify, listnotify
 from comandos.next import next
 from comandos.calendar import calendar
 from comandos.countdown import countdown
+from comandos.about import about
 from comandos.drivers import drivers
 from comandos.teams import teams
 from comandos.mensagens import MENSAGEM_INICIAL
@@ -30,6 +31,7 @@ def main():
     application.add_handler(CommandHandler("next", next))
     application.add_handler(CommandHandler("calendar", calendar))
     application.add_handler(CommandHandler("countdown", countdown))
+    application.add_handler(CommandHandler("about", about))
     application.add_handler(CommandHandler("notify", notify))
     application.add_handler(CommandHandler("listnotify", listnotify))
     application.add_handler(CommandHandler("clearnotify", clear_notify))
