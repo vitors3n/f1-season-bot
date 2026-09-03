@@ -10,11 +10,23 @@ Acompanhe a temporada de Fórmula 1 diretamente pelo Telegram.
 
 <b>Comandos disponíveis:</b>
 /next — Próxima corrida e horários
+/countdown — Contagem regressiva para a próxima sessão
 /calendar — Calendário da temporada
 /drivers — Classificação dos pilotos
 /teams — Classificação dos construtores
 /notify — Ativar lembretes da próxima corrida
-/listnotify — Consultar lembretes ativos"""
+/listnotify — Consultar lembretes ativos
+/about — Sobre o bot"""
+
+SOBRE_O_BOT = """🏎️ <b>Sobre o F1 Season Bot</b>
+
+Este bot ajuda você a acompanhar a temporada de Fórmula 1 pelo Telegram, com calendário, classificação, programação, contagem regressiva e lembretes das sessões.
+
+🕒 Todos os horários são exibidos no fuso de Fortaleza (CE).
+📊 Os dados são fornecidos pela <a href="https://jolpi.ca/">Jolpica F1 API</a>.
+💻 Projeto desenvolvido em Python com código disponível no <a href="https://github.com/vitors3n/f1-season-bot">GitHub</a>.
+
+Este é um projeto independente e não possui vínculo oficial com a Fórmula 1."""
 
 ERRO_CONSULTA = "⚠️ Não foi possível consultar os dados da Fórmula 1 agora. Tente novamente mais tarde."
 NAO_AUTORIZADO = "⛔ Você não tem permissão para executar este comando."
@@ -47,6 +59,34 @@ def proxima_corrida(corrida):
         f"📍 {escape(corrida.circuito)}\n\n"
         f"<b>Programação:</b>\n{programacao_formatada}"
     )
+
+
+def contagem_regressiva(corrida_nome, evento_nome, dia_hora, agora):
+    segundos = max(0, int((dia_hora - agora).total_seconds()))
+    minutos_totais = (segundos + 59) // 60
+    dias, minutos_restantes = divmod(minutos_totais, 24 * 60)
+    horas, minutos = divmod(minutos_restantes, 60)
+
+    partes = []
+    if dias:
+        partes.append(f"{dias} dia{'s' if dias != 1 else ''}")
+    if horas:
+        partes.append(f"{horas} hora{'s' if horas != 1 else ''}")
+    if minutos or not partes:
+        partes.append(f"{minutos} minuto{'s' if minutos != 1 else ''}")
+
+    tempo = ", ".join(partes)
+    horario = dia_hora.strftime("%d/%m/%Y às %H:%M")
+    return (
+        f"⏳ <b>Faltam {tempo}</b>\n\n"
+        f"🏁 {escape(corrida_nome)}\n"
+        f"📌 {escape(evento_nome)}\n"
+        f"🕒 {horario}"
+    )
+
+
+def nenhum_evento_futuro(corrida_nome):
+    return f"🏁 Não há mais sessões futuras em <b>{escape(corrida_nome)}</b>."
 
 
 def calendario_temporada(corridas, ano):
