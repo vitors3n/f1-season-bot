@@ -10,6 +10,7 @@ Acompanhe a temporada de Fórmula 1 diretamente pelo Telegram.
 
 <b>Comandos disponíveis:</b>
 /next — Próxima corrida e horários
+/countdown — Contagem regressiva para a próxima sessão
 /calendar — Calendário da temporada
 /drivers — Classificação dos pilotos
 /teams — Classificação dos construtores
@@ -47,6 +48,34 @@ def proxima_corrida(corrida):
         f"📍 {escape(corrida.circuito)}\n\n"
         f"<b>Programação:</b>\n{programacao_formatada}"
     )
+
+
+def contagem_regressiva(corrida_nome, evento_nome, dia_hora, agora):
+    segundos = max(0, int((dia_hora - agora).total_seconds()))
+    minutos_totais = (segundos + 59) // 60
+    dias, minutos_restantes = divmod(minutos_totais, 24 * 60)
+    horas, minutos = divmod(minutos_restantes, 60)
+
+    partes = []
+    if dias:
+        partes.append(f"{dias} dia{'s' if dias != 1 else ''}")
+    if horas:
+        partes.append(f"{horas} hora{'s' if horas != 1 else ''}")
+    if minutos or not partes:
+        partes.append(f"{minutos} minuto{'s' if minutos != 1 else ''}")
+
+    tempo = ", ".join(partes)
+    horario = dia_hora.strftime("%d/%m/%Y às %H:%M")
+    return (
+        f"⏳ <b>Faltam {tempo}</b>\n\n"
+        f"🏁 {escape(corrida_nome)}\n"
+        f"📌 {escape(evento_nome)}\n"
+        f"🕒 {horario}"
+    )
+
+
+def nenhum_evento_futuro(corrida_nome):
+    return f"🏁 Não há mais sessões futuras em <b>{escape(corrida_nome)}</b>."
 
 
 def calendario_temporada(corridas, ano):
