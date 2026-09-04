@@ -16,7 +16,31 @@ Acompanhe a temporada de Fórmula 1 diretamente pelo Telegram.
 /teams — Classificação dos construtores
 /notify — Ativar lembretes da próxima corrida
 /listnotify — Consultar lembretes ativos
+/help — Ver ajuda e todos os comandos
 /about — Sobre o bot"""
+
+AJUDA = """🏎️ <b>Ajuda — F1 Season Bot</b>
+
+<b>Corridas</b>
+/next — Exibe a próxima corrida e a programação do fim de semana.
+/countdown — Mostra quanto falta para a próxima sessão.
+/calendar — Lista as corridas da temporada atual.
+
+<b>Campeonato</b>
+/drivers — Mostra a classificação dos pilotos.
+/teams — Mostra a classificação dos construtores.
+
+<b>Notificações</b>
+/notify — Ativa lembretes para as sessões da próxima corrida.
+/listnotify — Lista os lembretes ativos neste chat.
+/clearnotify — Remove os lembretes deste chat.
+
+<b>Outros</b>
+/start — Exibe a mensagem inicial.
+/about — Mostra informações sobre o bot.
+/help — Exibe esta ajuda.
+
+🕒 Os horários são exibidos no fuso de Fortaleza (CE)."""
 
 SOBRE_O_BOT = """🏎️ <b>Sobre o F1 Season Bot</b>
 
