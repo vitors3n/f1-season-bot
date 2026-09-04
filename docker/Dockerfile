@@ -11,6 +11,9 @@ COPY modelos /usr/src/f1-bot/modelos
 COPY servicos /usr/src/f1-bot/servicos
 COPY bot.py /usr/src/f1-bot/
 
+RUN mkdir -p data jolpi_cache \
+    && chown -R f1bot /usr/src/f1-bot
+
 USER f1bot
 
 CMD ["python", "bot.py"]
