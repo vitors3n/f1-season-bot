@@ -12,6 +12,7 @@ Acompanhe a temporada de Fórmula 1 diretamente pelo Telegram.
 /next — Próxima corrida e horários
 /countdown — Contagem regressiva para a próxima sessão
 /calendar — Calendário da temporada
+/qualifying — Resultado da última classificação
 /drivers — Classificação dos pilotos
 /teams — Classificação dos construtores
 /notify — Ativar lembretes da próxima corrida
@@ -25,6 +26,7 @@ AJUDA = """🏎️ <b>Ajuda — F1 Season Bot</b>
 /next — Exibe a próxima corrida e a programação do fim de semana.
 /countdown — Mostra quanto falta para a próxima sessão.
 /calendar — Lista as corridas da temporada atual.
+/qualifying — Mostra o resultado da última classificação.
 
 <b>Campeonato</b>
 /drivers — Mostra a classificação dos pilotos.
@@ -142,6 +144,35 @@ def calendario_temporada(corridas, ano):
         )
 
     linhas.extend(["", "🕒 Horários de Fortaleza (CE)"])
+    return "\n".join(linhas)
+
+
+def resultado_classificacao(corrida):
+    nome_corrida = escape(corrida["raceName"])
+    circuito = escape(corrida["Circuit"]["circuitName"])
+    linhas = [
+        "🏁 <b>Resultado da última classificação</b>",
+        f"🏆 {nome_corrida}",
+        f"📍 {circuito}",
+        "",
+    ]
+
+    for resultado in corrida["QualifyingResults"]:
+        piloto = resultado["Driver"]
+        nome_piloto = escape(f'{piloto["givenName"]} {piloto["familyName"]}')
+        codigo = escape(piloto.get("code") or resultado["number"])
+        equipe = escape(resultado["Constructor"]["name"])
+
+        sessao = next(
+            (nome for nome in ("Q3", "Q2", "Q1") if resultado.get(nome)),
+            None,
+        )
+        tempo = f" — {sessao}: {resultado[sessao]}" if sessao else ""
+        linhas.append(
+            f'<b>{resultado["position"]}. {codigo}</b> — '
+            f"{nome_piloto} ({equipe}){tempo}"
+        )
+
     return "\n".join(linhas)
 
 
