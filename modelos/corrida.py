@@ -35,6 +35,8 @@ class Corrida(Evento):
         super().__init__(corrida_json['date'], corrida_json['time'])
         self.nome = corrida_json['raceName']
         self.circuito = corrida_json['Circuit']['circuitName']
+        self.latitude = float(corrida_json['Circuit']['Location']['lat'])
+        self.longitude = float(corrida_json['Circuit']['Location']['long'])
         self.fp1 = DiaEvento('Treino Livre 1', corrida_json['FirstPractice'])
         self.fp2 = None
         self.fp3 = None
