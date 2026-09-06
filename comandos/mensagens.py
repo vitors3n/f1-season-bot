@@ -217,7 +217,6 @@ def previsao_tempo(corrida_nome, circuito, sessoes):
             "",
         ])
 
-    linhas.append("🕒 Horários de Fortaleza (CE)")
     return "\n".join(linhas)
 
 
