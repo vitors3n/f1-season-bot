@@ -7,6 +7,7 @@ from comandos.countdown import countdown
 from comandos.about import about
 from comandos.help import help_command
 from comandos.qualifying import qualifying
+from comandos.weather import weather
 from comandos.drivers import drivers
 from comandos.teams import teams
 from comandos.mensagens import MENSAGEM_INICIAL
@@ -36,6 +37,7 @@ def main():
     application.add_handler(CommandHandler("about", about))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("qualifying", qualifying))
+    application.add_handler(CommandHandler("weather", weather))
     application.add_handler(CommandHandler("notify", notify))
     application.add_handler(CommandHandler("listnotify", listnotify))
     application.add_handler(CommandHandler("clearnotify", clear_notify))

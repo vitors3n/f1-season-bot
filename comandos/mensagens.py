@@ -13,6 +13,7 @@ Acompanhe a temporada de Fórmula 1 diretamente pelo Telegram.
 /countdown — Contagem regressiva para a próxima sessão
 /calendar — Calendário da temporada
 /qualifying — Resultado da última classificação
+/weather — Previsão do tempo para o próximo GP
 /drivers — Classificação dos pilotos
 /teams — Classificação dos construtores
 /notify — Ativar lembretes da próxima corrida
@@ -27,6 +28,7 @@ AJUDA = """🏎️ <b>Ajuda — F1 Season Bot</b>
 /countdown — Mostra quanto falta para a próxima sessão.
 /calendar — Lista as corridas da temporada atual.
 /qualifying — Mostra o resultado da última classificação.
+/weather — Mostra a previsão do tempo para as sessões do próximo GP.
 
 <b>Campeonato</b>
 /drivers — Mostra a classificação dos pilotos.
@@ -57,6 +59,7 @@ Este é um projeto independente e não possui vínculo oficial com a Fórmula 1.
 ERRO_CONSULTA = "⚠️ Não foi possível consultar os dados da Fórmula 1 agora. Tente novamente mais tarde."
 NAO_AUTORIZADO = "⛔ Você não tem permissão para executar este comando."
 NOTIFICACOES_REMOVIDAS = "🔕 Todas as notificações foram removidas."
+PREVISAO_INDISPONIVEL = "🌦️ A previsão para o próximo GP ainda não está disponível. Tente novamente quando o evento estiver mais próximo."
 
 
 def _horario(evento):
@@ -173,6 +176,48 @@ def resultado_classificacao(corrida):
             f"{nome_piloto} ({equipe}){tempo}"
         )
 
+    return "\n".join(linhas)
+
+
+def _descricao_tempo(codigo):
+    if codigo == 0:
+        return "☀️ Céu limpo"
+    if codigo in (1, 2, 3):
+        return "⛅ Parcialmente nublado"
+    if codigo in (45, 48):
+        return "🌫️ Nevoeiro"
+    if codigo in (51, 53, 55, 56, 57):
+        return "🌦️ Garoa"
+    if codigo in (61, 63, 65, 66, 67):
+        return "🌧️ Chuva"
+    if codigo in (71, 73, 75, 77, 85, 86):
+        return "🌨️ Neve"
+    if codigo in (80, 81, 82):
+        return "🌦️ Pancadas de chuva"
+    if codigo in (95, 96, 99):
+        return "⛈️ Trovoadas"
+    return "🌡️ Condição variável"
+
+
+def previsao_tempo(corrida_nome, circuito, sessoes):
+    linhas = [
+        f"🌦️ <b>Previsão — {escape(corrida_nome)}</b>",
+        f"📍 {escape(circuito)}",
+        "",
+    ]
+
+    for sessao in sessoes:
+        horario = sessao["dia_hora"].strftime("%d/%m às %H:%M")
+        linhas.extend([
+            f'<b>{escape(sessao["nome"])}</b> — {horario}',
+            _descricao_tempo(sessao["codigo"]),
+            f'🌡️ {sessao["temperatura"]} °C · '
+            f'🌧️ {sessao["chance_chuva"]}% · '
+            f'💨 {sessao["vento"]} km/h',
+            "",
+        ])
+
+    linhas.append("🕒 Horários de Fortaleza (CE)")
     return "\n".join(linhas)
 
 
