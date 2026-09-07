@@ -23,16 +23,8 @@ jobs:
             exit 1
           fi
 
-      - name: Criar .env de deploy
+      - name: Build and deploy f1bot
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        shell: bash
         run: |
-          umask 077
-          printf 'BOT_TOKEN=%s\n' "$BOT_TOKEN" > .env
-
-      - name: Build and deploy f1bot
-        shell: bash
-        run: |
-          trap 'rm -f .env' EXIT
-          docker compose -f docker/docker-compose.yml --env-file .env up -d --build --remove-orphans
+          docker compose -f docker/docker-compose.yml up -d --build --remove-orphans
