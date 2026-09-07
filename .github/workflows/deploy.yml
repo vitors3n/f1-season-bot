@@ -21,11 +21,8 @@ jobs:
     runs-on: [self-hosted, apolo-runner]
     needs: build
     steps:
-      - name: create .env
-        run: |
-          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
-
       - name: Deploy f1bot
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
-          docker compose -f docker/docker-compose.yml down
-          docker compose -f docker/docker-compose.yml --env-file .env up -d
+          docker compose -f docker/docker-compose.yml up -d --remove-orphans

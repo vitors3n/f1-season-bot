@@ -3,9 +3,10 @@ from datetime import datetime
 from diskcache import Cache
 import pytz
 import requests
+from config import CACHE_DIRECTORY, CACHE_TTL_WEATHER, REQUEST_TIMEOUT
 
 
-cache = Cache("jolpi_cache")
+cache = Cache(CACHE_DIRECTORY)
 
 
 def pega_previsao(latitude, longitude):
@@ -31,11 +32,11 @@ def pega_previsao(latitude, longitude):
         response = requests.get(
             "https://api.open-meteo.com/v1/forecast",
             params=parametros,
-            timeout=15,
+            timeout=REQUEST_TIMEOUT,
         )
         response.raise_for_status()
         data = response.json()
-        cache.set(cache_key, data, expire=30 * 60)
+        cache.set(cache_key, data, expire=CACHE_TTL_WEATHER)
         print("~ Usando API ~")
         return data
     except (requests.RequestException, ValueError):

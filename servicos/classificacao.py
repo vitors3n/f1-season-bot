@@ -1,8 +1,9 @@
 from diskcache import Cache
 import requests
+from config import CACHE_DIRECTORY, CACHE_TTL_QUALIFYING, REQUEST_TIMEOUT
 
 
-cache = Cache("jolpi_cache")
+cache = Cache(CACHE_DIRECTORY)
 
 
 def pega_ultima_classificacao():
@@ -13,10 +14,10 @@ def pega_ultima_classificacao():
         print("~ Usando cache ~")
     else:
         try:
-            response = requests.get(url, timeout=15)
+            response = requests.get(url, timeout=REQUEST_TIMEOUT)
             response.raise_for_status()
             data = response.json()
-            cache.set(url, data, expire=30 * 60)
+            cache.set(url, data, expire=CACHE_TTL_QUALIFYING)
             print("~ Usando API ~")
         except (requests.RequestException, ValueError):
             return None

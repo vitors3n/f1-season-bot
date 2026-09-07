@@ -11,16 +11,12 @@ from comandos.weather import weather
 from comandos.drivers import drivers
 from comandos.teams import teams
 from comandos.mensagens import MENSAGEM_INICIAL
-from dotenv import load_dotenv
+from config import BOT_TOKEN, LOG_LEVEL
 from telegram import Update
 import logging
-import os
-
-load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=LOG_LEVEL
 )
 
 logger = logging.getLogger(__name__)

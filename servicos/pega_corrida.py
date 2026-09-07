@@ -1,8 +1,9 @@
 from modelos.corrida import Corrida
 from diskcache import Cache
 import requests
+from config import CACHE_DIRECTORY, CACHE_TTL_NEXT_RACE, REQUEST_TIMEOUT
 
-cache = Cache('jolpi_cache')
+cache = Cache(CACHE_DIRECTORY)
 
 def pega_corrida():
     url = "https://api.jolpi.ca/ergast/f1/current/next.json"
@@ -11,11 +12,14 @@ def pega_corrida():
     if data is not None:
         print('~ Usando cache ~')
     else:
-        response = requests.get(url)
-        print('~ Usando API ~')
-        if response.status_code == 200:
+        try:
+            response = requests.get(url, timeout=REQUEST_TIMEOUT)
+            response.raise_for_status()
             data = response.json()
-            cache.set(url, data, expire=12*60*60)
+            cache.set(url, data, expire=CACHE_TTL_NEXT_RACE)
+            print('~ Usando API ~')
+        except (requests.RequestException, ValueError):
+            return None
 
     # Bloco para quando não for possível acessar a API e não existir cache
     if data is None:

@@ -5,14 +5,14 @@ from comandos.mensagens import (
     contagem_regressiva,
     nenhum_evento_futuro,
 )
-from modelos.corrida import TIMEZONE_FORTALEZA
+from modelos.corrida import TIMEZONE_PADRAO
 from servicos.pega_corrida import pega_corrida
 from telegram import Update
 from telegram.ext import ContextTypes
 
 
 def _proximo_evento(corrida, agora=None):
-    agora = agora or datetime.now(TIMEZONE_FORTALEZA)
+    agora = agora or datetime.now(TIMEZONE_PADRAO)
     eventos = [corrida.fp1, corrida.quali]
 
     if corrida.sprint:
@@ -38,7 +38,7 @@ async def countdown(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(ERRO_CONSULTA)
         return
 
-    agora = datetime.now(TIMEZONE_FORTALEZA)
+    agora = datetime.now(TIMEZONE_PADRAO)
     evento = _proximo_evento(corrida, agora)
     if evento is None:
         await update.message.reply_text(nenhum_evento_futuro(corrida.nome), parse_mode="HTML")

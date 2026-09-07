@@ -1,6 +1,7 @@
 from datetime import datetime
 from html import escape
 
+from config import TIMEZONE_LABEL
 from modelos.corrida import corrigir_timezone
 
 
@@ -21,7 +22,7 @@ Acompanhe a temporada de Fórmula 1 diretamente pelo Telegram.
 /help — Ver ajuda e todos os comandos
 /about — Sobre o bot"""
 
-AJUDA = """🏎️ <b>Ajuda — F1 Season Bot</b>
+AJUDA = f"""🏎️ <b>Ajuda — F1 Season Bot</b>
 
 <b>Corridas</b>
 /next — Exibe a próxima corrida e a programação do fim de semana.
@@ -44,13 +45,13 @@ AJUDA = """🏎️ <b>Ajuda — F1 Season Bot</b>
 /about — Mostra informações sobre o bot.
 /help — Exibe esta ajuda.
 
-🕒 Os horários são exibidos no fuso de Fortaleza (CE)."""
+🕒 Os horários são exibidos no fuso de {TIMEZONE_LABEL}."""
 
-SOBRE_O_BOT = """🏎️ <b>Sobre o F1 Season Bot</b>
+SOBRE_O_BOT = f"""🏎️ <b>Sobre o F1 Season Bot</b>
 
 Este bot ajuda você a acompanhar a temporada de Fórmula 1 pelo Telegram, com calendário, classificação, programação, contagem regressiva e lembretes das sessões.
 
-🕒 Todos os horários são exibidos no fuso de Fortaleza (CE).
+🕒 Todos os horários são exibidos no fuso de {TIMEZONE_LABEL}.
 📊 Os dados são fornecidos pela <a href="https://jolpi.ca/">Jolpica F1 API</a>.
 💻 Projeto desenvolvido em Python com código disponível no <a href="https://github.com/vitors3n/f1-season-bot">GitHub</a>.
 
@@ -146,7 +147,7 @@ def calendario_temporada(corridas, ano):
             f"{dia_da_semana}, {data_formatada}"
         )
 
-    linhas.extend(["", "🕒 Horários de Fortaleza (CE)"])
+    linhas.extend(["", f"🕒 Horários de {TIMEZONE_LABEL}"])
     return "\n".join(linhas)
 
 
