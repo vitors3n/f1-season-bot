@@ -11,22 +11,18 @@ from comandos.mensagens import (
 )
 from telegram.ext import ContextTypes
 from datetime import timedelta
-from dotenv import load_dotenv
 from telegram import Update
 from telegram import Bot
-from modelos.corrida import TIMEZONE_FORTALEZA
-import os
-
-load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+from config import BOT_TOKEN, DATABASE_URL, REMINDER_MINUTES
+from modelos.corrida import TIMEZONE_PADRAO
 
 bot = Bot(token=BOT_TOKEN)
 
 lembretes = {
-    'default': SQLAlchemyJobStore(url='sqlite:///data/lembretes.sqlite')
+    'default': SQLAlchemyJobStore(url=DATABASE_URL)
 }
 
-scheduler = AsyncIOScheduler(jobstores=lembretes, timezone=TIMEZONE_FORTALEZA)
+scheduler = AsyncIOScheduler(jobstores=lembretes, timezone=TIMEZONE_PADRAO)
 scheduler.start()
 
 async def enviar_lembrete(chat_id, thread_id, evento_nome, minutos):
@@ -38,26 +34,15 @@ async def enviar_lembrete(chat_id, thread_id, evento_nome, minutos):
     )
 
 def adiciona_lembrete(chat_id, thread_id, evento):
-    lembrete_10_minutos = evento.dia_hora_datetime() - timedelta(minutes=10)
-    lembrete_5_minutos = evento.dia_hora_datetime() - timedelta(minutes=5)
-
-    scheduler.add_job(
-        enviar_lembrete,
-        'date',
-        run_date=lembrete_10_minutos,
-        args=[chat_id, thread_id, evento.nome, 10 ],
-        id=f'{evento.nome}_{evento.dia_hora()}_10min{chat_id}',
-        misfire_grace_time=20
-    )
-
-    scheduler.add_job(
-        enviar_lembrete,
-        'date',
-        run_date=lembrete_5_minutos,
-        args=[chat_id, thread_id, evento.nome, 5],
-        id=f'{evento.nome}_{evento.dia_hora()}_5min{chat_id}',
-        misfire_grace_time=20
-    )
+    for minutos in REMINDER_MINUTES:
+        scheduler.add_job(
+            enviar_lembrete,
+            'date',
+            run_date=evento.dia_hora_datetime() - timedelta(minutes=minutos),
+            args=[chat_id, thread_id, evento.nome, minutos],
+            id=f'{evento.nome}_{evento.dia_hora()}_{minutos}min{chat_id}',
+            misfire_grace_time=20,
+        )
 
 async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     jobs = scheduler.get_jobs()

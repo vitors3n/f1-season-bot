@@ -5,7 +5,7 @@ from comandos.mensagens import (
     PREVISAO_INDISPONIVEL,
     previsao_tempo,
 )
-from modelos.corrida import TIMEZONE_FORTALEZA
+from modelos.corrida import TIMEZONE_PADRAO
 from servicos.meteorologia import pega_previsao, previsao_no_horario
 from servicos.pega_corrida import pega_corrida
 from telegram import Update
@@ -34,7 +34,7 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     sessoes = []
-    agora = datetime.now(TIMEZONE_FORTALEZA)
+    agora = datetime.now(TIMEZONE_PADRAO)
     for evento in _eventos_da_corrida(corrida):
         if evento.dia_hora_datetime() < agora:
             continue

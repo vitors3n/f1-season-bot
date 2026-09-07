@@ -1,12 +1,13 @@
 from datetime import datetime
 import pytz
+from config import DEFAULT_TIMEZONE
 
-TIMEZONE_FORTALEZA = pytz.timezone("America/Fortaleza")
+TIMEZONE_PADRAO = pytz.timezone(DEFAULT_TIMEZONE)
 
 def corrigir_timezone(dia, hora):
     dia_hora_string = f"{dia} {hora}"
     dia_hora_utc = datetime.strptime(dia_hora_string, "%Y-%m-%d %H:%M:%SZ").replace(tzinfo=pytz.UTC)
-    dia_hora_local = dia_hora_utc.astimezone(TIMEZONE_FORTALEZA)
+    dia_hora_local = dia_hora_utc.astimezone(TIMEZONE_PADRAO)
     return dia_hora_local
 
 class Evento:
