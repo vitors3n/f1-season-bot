@@ -7,22 +7,24 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  deploy:
     runs-on: [self-hosted, apolo-runner]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build f1bot docker image
+      - name: Validar BOT_TOKEN
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        shell: bash
         run: |
-          docker compose -f docker/docker-compose.yml build --no-cache
+          if [ -z "$BOT_TOKEN" ]; then
+            echo "::error::O secret BOT_TOKEN não está definido ou está vazio."
+            exit 1
+          fi
 
-  deploy:
-    runs-on: [self-hosted, apolo-runner]
-    needs: build
-    steps:
-      - name: Deploy f1bot
+      - name: Build and deploy f1bot
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
-          docker compose -f docker/docker-compose.yml up -d --remove-orphans
+          docker compose -f docker/docker-compose.yml up -d --build --remove-orphans
