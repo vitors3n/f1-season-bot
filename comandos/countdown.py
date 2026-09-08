@@ -33,7 +33,7 @@ def _proximo_evento(corrida, agora=None):
 
 
 async def countdown(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    corrida = pega_corrida()
+    corrida = await pega_corrida()
     if corrida is None:
         await update.message.reply_text(ERRO_CONSULTA)
         return

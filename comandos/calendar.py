@@ -5,7 +5,7 @@ from telegram.ext import ContextTypes
 
 
 async def calendar(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    corridas = pega_calendario()
+    corridas = await pega_calendario()
     if not corridas:
         await update.message.reply_text(ERRO_CONSULTA)
         return

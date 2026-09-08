@@ -50,7 +50,7 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat.id
     thread_id = update.message.message_thread_id
 
-    corrida = pega_corrida()
+    corrida = await pega_corrida()
     if corrida is None:
         await update.message.reply_text(ERRO_CONSULTA)
         return

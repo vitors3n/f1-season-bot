@@ -6,7 +6,7 @@ from telegram import Update
 
 
 async def drivers(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    pilotos = campeonato_pilotos()
+    pilotos = await campeonato_pilotos()
     if pilotos is None:
         await update.message.reply_text(ERRO_CONSULTA)
         return
