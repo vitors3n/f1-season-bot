@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 async def teams(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    times = campeonato_construtores()
+    times = await campeonato_construtores()
     if times is None:
         await update.message.reply_text(ERRO_CONSULTA)
         return

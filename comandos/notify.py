@@ -23,7 +23,16 @@ lembretes = {
 }
 
 scheduler = AsyncIOScheduler(jobstores=lembretes, timezone=TIMEZONE_PADRAO)
-scheduler.start()
+
+
+def iniciar_scheduler():
+    if not scheduler.running:
+        scheduler.start()
+
+
+def encerrar_scheduler():
+    if scheduler.running:
+        scheduler.shutdown(wait=False)
 
 async def enviar_lembrete(chat_id, thread_id, evento_nome, minutos):
     await bot.send_message(
@@ -50,7 +59,7 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat.id
     thread_id = update.message.message_thread_id
 
-    corrida = pega_corrida()
+    corrida = await pega_corrida()
     if corrida is None:
         await update.message.reply_text(ERRO_CONSULTA)
         return

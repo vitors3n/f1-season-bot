@@ -23,12 +23,12 @@ def _eventos_da_corrida(corrida):
 
 
 async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    corrida = pega_corrida()
+    corrida = await pega_corrida()
     if corrida is None:
         await update.message.reply_text(ERRO_CONSULTA)
         return
 
-    previsao = pega_previsao(corrida.latitude, corrida.longitude)
+    previsao = await pega_previsao(corrida.latitude, corrida.longitude)
     if previsao is None:
         await update.message.reply_text(ERRO_CONSULTA)
         return

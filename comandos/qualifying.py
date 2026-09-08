@@ -5,7 +5,7 @@ from telegram.ext import ContextTypes
 
 
 async def qualifying(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    corrida = pega_ultima_classificacao()
+    corrida = await pega_ultima_classificacao()
     if corrida is None:
         await update.message.reply_text(ERRO_CONSULTA)
         return

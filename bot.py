@@ -1,6 +1,11 @@
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from comandos.notify import clear_notify
-from comandos.notify import notify, listnotify
+from comandos.notify import (
+    clear_notify,
+    encerrar_scheduler,
+    iniciar_scheduler,
+    listnotify,
+    notify,
+)
 from comandos.next import next
 from comandos.calendar import calendar
 from comandos.countdown import countdown
@@ -24,8 +29,22 @@ logger = logging.getLogger(__name__)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(MENSAGEM_INICIAL, parse_mode='HTML')
 
+
+async def iniciar_aplicacao(application):
+    iniciar_scheduler()
+
+
+async def encerrar_aplicacao(application):
+    encerrar_scheduler()
+
 def main():
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    application = (
+        ApplicationBuilder()
+        .token(BOT_TOKEN)
+        .post_init(iniciar_aplicacao)
+        .post_stop(encerrar_aplicacao)
+        .build()
+    )
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("next", next))
     application.add_handler(CommandHandler("calendar", calendar))

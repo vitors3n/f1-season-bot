@@ -2,14 +2,14 @@ from datetime import datetime
 
 from diskcache import Cache
 import pytz
-import requests
-from config import CACHE_DIRECTORY, CACHE_TTL_WEATHER, REQUEST_TIMEOUT
+from config import CACHE_DIRECTORY, CACHE_TTL_WEATHER
+from servicos.http_client import busca_json
 
 
 cache = Cache(CACHE_DIRECTORY)
 
 
-def pega_previsao(latitude, longitude):
+async def pega_previsao(latitude, longitude):
     cache_key = f"weather:{latitude}:{longitude}"
     data = cache.get(cache_key)
 
@@ -28,19 +28,15 @@ def pega_previsao(latitude, longitude):
         "timezone": "UTC",
     }
 
-    try:
-        response = requests.get(
-            "https://api.open-meteo.com/v1/forecast",
-            params=parametros,
-            timeout=REQUEST_TIMEOUT,
-        )
-        response.raise_for_status()
-        data = response.json()
-        cache.set(cache_key, data, expire=CACHE_TTL_WEATHER)
-        print("~ Usando API ~")
-        return data
-    except (requests.RequestException, ValueError):
+    data = await busca_json(
+        "https://api.open-meteo.com/v1/forecast",
+        params=parametros,
+    )
+    if data is None:
         return None
+    cache.set(cache_key, data, expire=CACHE_TTL_WEATHER)
+    print("~ Usando API ~")
+    return data
 
 
 def previsao_no_horario(previsao, dia_hora):
