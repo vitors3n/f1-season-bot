@@ -1,4 +1,4 @@
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
 from comandos.notify import (
     clear_notify,
     encerrar_scheduler,
@@ -15,6 +15,7 @@ from comandos.qualifying import qualifying
 from comandos.weather import weather
 from comandos.drivers import drivers
 from comandos.teams import teams
+from comandos.settings import settings, settings_callback
 from comandos.mensagens import MENSAGEM_INICIAL
 from config import BOT_TOKEN, LOG_LEVEL
 from telegram import Update
@@ -58,6 +59,8 @@ def main():
     application.add_handler(CommandHandler("clearnotify", clear_notify))
     application.add_handler(CommandHandler("drivers", drivers))
     application.add_handler(CommandHandler("teams", teams))
+    application.add_handler(CommandHandler("settings", settings))
+    application.add_handler(CallbackQueryHandler(settings_callback, pattern="^settings:"))
     application.run_polling()
 
 if __name__ == "__main__":

@@ -19,6 +19,7 @@ Acompanhe a temporada de Fórmula 1 diretamente pelo Telegram.
 /teams — Classificação dos construtores
 /notify — Ativar lembretes da próxima corrida
 /listnotify — Consultar lembretes ativos
+/settings — Configurar lembretes deste chat
 /help — Ver ajuda e todos os comandos
 /about — Sobre o bot"""
 
@@ -39,6 +40,7 @@ AJUDA = f"""🏎️ <b>Ajuda — F1 Season Bot</b>
 /notify — Ativa lembretes para as sessões da próxima corrida.
 /listnotify — Lista os lembretes ativos neste chat.
 /clearnotify — Remove os lembretes deste chat.
+/settings — Configura os lembretes deste chat.
 
 <b>Outros</b>
 /start — Exibe a mensagem inicial.
@@ -258,3 +260,25 @@ def lista_notificacoes(nomes):
         return "🔕 Nenhuma notificação está ativa neste chat."
     itens = "\n".join(f"• {escape(nome)}" for nome in nomes)
     return f"🔔 <b>Notificações ativas neste chat:</b>\n\n{itens}"
+
+
+def configuracoes_chat(configuracoes, mostrar_sessoes=False):
+    minutos = " e ".join(str(minuto) for minuto in configuracoes["reminder_minutes"])
+    sessoes = configuracoes["sessions"]
+    if mostrar_sessoes:
+        descricao = "Escolha quais sessões receberão lembretes."
+    elif len(sessoes) == 7:
+        descricao = "Todas"
+    else:
+        descricao = f"{len(sessoes)} selecionada(s)"
+
+    texto = (
+        "⚙️ <b>Configurações deste chat</b>\n\n"
+        f"🕒 Fuso: {configuracoes['timezone']}\n"
+        f"⏰ Lembretes: {minutos} min antes\n"
+        f"🏁 Sessões: {descricao}\n"
+        "🌐 Idioma: Português\n\n"
+    )
+    if mostrar_sessoes:
+        return texto + "Escolha as sessões abaixo:"
+    return texto + "Use os botões abaixo para alterar as sessões dos próximos lembretes."

@@ -96,6 +96,7 @@ docker compose -f docker/docker-compose.yml stop f1bot
 | `/notify` | Ativa lembretes para o próximo GP. |
 | `/listnotify` | Lista os lembretes deste chat. |
 | `/clearnotify` | Remove os lembretes deste chat. |
+| `/settings` | Configura as sessões que este chat receberá nos lembretes. |
 | `/help` | Lista todos os comandos. |
 | `/about` | Informações sobre o bot. |
 
@@ -109,6 +110,7 @@ As opções são carregadas de `.env`; valores não definidos usam os padrões d
 | `DEFAULT_TIMEZONE` | `America/Fortaleza` | Fuso usado para horários e agendamento. |
 | `TIMEZONE_LABEL` | `Fortaleza (CE)` | Nome apresentado nas mensagens. |
 | `DATABASE_URL` | `sqlite:///data/lembretes.sqlite` | Banco dos lembretes do APScheduler. |
+| `SETTINGS_DATABASE_PATH` | `data/configuracoes.sqlite` | Banco das preferências por chat. |
 | `CACHE_DIRECTORY` | `jolpi_cache` | Diretório do cache das APIs. |
 | `REQUEST_TIMEOUT` | `15` | Tempo máximo de espera por uma API, em segundos. |
 | `REMINDER_MINUTES` | `10,5` | Minutos de antecedência dos lembretes. |
