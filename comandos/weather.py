@@ -2,6 +2,7 @@ from datetime import datetime
 
 from comandos.mensagens import (
     ERRO_CONSULTA,
+    HORARIOS_INDEFINIDOS,
     PREVISAO_INDISPONIVEL,
     previsao_tempo,
 )
@@ -19,13 +20,19 @@ def _eventos_da_corrida(corrida):
     else:
         eventos.extend([corrida.fp2, corrida.fp3])
     eventos.extend([corrida.quali, corrida])
-    return sorted(eventos, key=lambda evento: evento.dia_hora_datetime())
+    eventos_com_horario = [evento for evento in eventos if evento.tem_horario]
+    return sorted(eventos_com_horario, key=lambda evento: evento.dia_hora_datetime())
 
 
 async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     corrida = await pega_corrida()
     if corrida is None:
         await update.message.reply_text(ERRO_CONSULTA)
+        return
+
+    eventos = _eventos_da_corrida(corrida)
+    if not eventos:
+        await update.message.reply_text(HORARIOS_INDEFINIDOS)
         return
 
     previsao = await pega_previsao(corrida.latitude, corrida.longitude)
@@ -35,7 +42,7 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     sessoes = []
     agora = datetime.now(TIMEZONE_PADRAO)
-    for evento in _eventos_da_corrida(corrida):
+    for evento in eventos:
         if evento.dia_hora_datetime() < agora:
             continue
         dados = previsao_no_horario(previsao, evento.dia_hora_datetime())

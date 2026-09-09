@@ -4,6 +4,7 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from servicos.pega_corrida import pega_corrida
 from comandos.mensagens import (
     ERRO_CONSULTA,
+    HORARIOS_INDEFINIDOS,
     NOTIFICACOES_REMOVIDAS,
     lembrete,
     lista_notificacoes,
@@ -15,6 +16,7 @@ from telegram import Update
 from telegram import Bot
 from config import BOT_TOKEN, DATABASE_URL, REMINDER_MINUTES
 from modelos.corrida import TIMEZONE_PADRAO
+from servicos.configuracoes import obter_configuracoes
 
 bot = Bot(token=BOT_TOKEN)
 
@@ -42,12 +44,16 @@ async def enviar_lembrete(chat_id, thread_id, evento_nome, minutos):
         reply_to_message_id=thread_id,
     )
 
-def adiciona_lembrete(chat_id, thread_id, evento):
-    for minutos in REMINDER_MINUTES:
+def adiciona_lembrete(chat_id, thread_id, evento, minutos_lembrete=REMINDER_MINUTES):
+    dia_hora = evento.dia_hora_datetime()
+    if dia_hora is None:
+        return
+
+    for minutos in minutos_lembrete:
         scheduler.add_job(
             enviar_lembrete,
             'date',
-            run_date=evento.dia_hora_datetime() - timedelta(minutes=minutos),
+            run_date=dia_hora - timedelta(minutes=minutos),
             args=[chat_id, thread_id, evento.nome, minutos],
             id=f'{evento.nome}_{evento.dia_hora()}_{minutos}min{chat_id}',
             misfire_grace_time=20,
@@ -64,19 +70,26 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(ERRO_CONSULTA)
         return
 
-    lista_eventos = [corrida, corrida.fp1, corrida.quali]
+    eventos_por_tipo = [("race", corrida), ("fp1", corrida.fp1), ("quali", corrida.quali)]
 
     if corrida.sprint:
-        lista_eventos.append(corrida.sprint_quali)
-        lista_eventos.append(corrida.sprint)
+        eventos_por_tipo.extend([("sprint_quali", corrida.sprint_quali), ("sprint", corrida.sprint)])
     
     if not corrida.sprint:
-        lista_eventos.append(corrida.fp2)
-        lista_eventos.append(corrida.fp3)
+        eventos_por_tipo.extend([("fp2", corrida.fp2), ("fp3", corrida.fp3)])
+
+    configuracoes = obter_configuracoes(chat_id)
+    lista_eventos = [
+        evento for tipo, evento in eventos_por_tipo
+        if tipo in configuracoes["sessions"] and evento.tem_horario
+    ]
+    if not lista_eventos:
+        await update.message.reply_text(HORARIOS_INDEFINIDOS)
+        return
 
     for evento in lista_eventos:
         try:
-            adiciona_lembrete(chat_id, thread_id, evento)
+            adiciona_lembrete(chat_id, thread_id, evento, configuracoes["reminder_minutes"])
         except ConflictingIdError:
             print('Job já existe... Ignorando...')
     await update.message.reply_text(

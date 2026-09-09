@@ -12,28 +12,38 @@ def corrigir_timezone(dia, hora):
 
 class Evento:
 
-    def __init__(self, dia, hora):
+    def __init__(self, dia, hora=None):
         self.dia = dia
         self.hora = hora
-    
+
+    @property
+    def tem_horario(self):
+        return bool(self.hora)
+
     def dia_hora(self):
+        if not self.tem_horario:
+            dia = datetime.strptime(self.dia, "%Y-%m-%d")
+            return f'{dia.strftime("%d/%m/%Y")}, horário a definir'
+
         dia_hora_local = corrigir_timezone(self.dia, self.hora)
         dia_hora_local = dia_hora_local.strftime("%d/%m/%Y, %H:%M")
         return dia_hora_local
-    
+
     def dia_hora_datetime(self):
+        if not self.tem_horario:
+            return None
         return corrigir_timezone(self.dia, self.hora)
 
 class DiaEvento(Evento):
 
     def __init__(self, nome, evento_json):
-        super().__init__(evento_json['date'], evento_json['time'])
+        super().__init__(evento_json['date'], evento_json.get('time'))
         self.nome = nome
 
 class Corrida(Evento):
 
     def __init__(self, corrida_json):
-        super().__init__(corrida_json['date'], corrida_json['time'])
+        super().__init__(corrida_json['date'], corrida_json.get('time'))
         self.nome = corrida_json['raceName']
         self.circuito = corrida_json['Circuit']['circuitName']
         self.latitude = float(corrida_json['Circuit']['Location']['lat'])

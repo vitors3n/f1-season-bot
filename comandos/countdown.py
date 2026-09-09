@@ -2,6 +2,7 @@ from datetime import datetime
 
 from comandos.mensagens import (
     ERRO_CONSULTA,
+    HORARIOS_INDEFINIDOS,
     contagem_regressiva,
     nenhum_evento_futuro,
 )
@@ -11,8 +12,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 
-def _proximo_evento(corrida, agora=None):
-    agora = agora or datetime.now(TIMEZONE_PADRAO)
+def _eventos_da_corrida(corrida):
     eventos = [corrida.fp1, corrida.quali]
 
     if corrida.sprint:
@@ -21,9 +21,14 @@ def _proximo_evento(corrida, agora=None):
         eventos.extend([corrida.fp2, corrida.fp3])
 
     eventos.append(corrida)
+    return eventos
+
+
+def _proximo_evento(corrida, agora=None):
+    agora = agora or datetime.now(TIMEZONE_PADRAO)
     eventos_futuros = [
-        evento for evento in eventos
-        if evento.dia_hora_datetime() > agora
+        evento for evento in _eventos_da_corrida(corrida)
+        if evento.tem_horario and evento.dia_hora_datetime() > agora
     ]
 
     if not eventos_futuros:
@@ -41,6 +46,9 @@ async def countdown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     agora = datetime.now(TIMEZONE_PADRAO)
     evento = _proximo_evento(corrida, agora)
     if evento is None:
+        if not any(evento.tem_horario for evento in _eventos_da_corrida(corrida)):
+            await update.message.reply_text(HORARIOS_INDEFINIDOS)
+            return
         await update.message.reply_text(nenhum_evento_futuro(corrida.nome), parse_mode="HTML")
         return
 
