@@ -61,9 +61,13 @@ ERRO_CONSULTA = "⚠️ Não foi possível consultar os dados da Fórmula 1 agor
 NAO_AUTORIZADO = "⛔ Você não tem permissão para executar este comando."
 NOTIFICACOES_REMOVIDAS = "🔕 Todas as notificações foram removidas."
 PREVISAO_INDISPONIVEL = "🌦️ A previsão para o próximo GP ainda não está disponível. Tente novamente quando o evento estiver mais próximo."
+HORARIOS_INDEFINIDOS = "🕒 Os horários das sessões da próxima corrida ainda não foram definidos."
 
 
 def _horario(evento):
+    if not evento.tem_horario:
+        return evento.dia_hora()
+
     return evento.dia_hora().replace(", ", " às ")
 
 

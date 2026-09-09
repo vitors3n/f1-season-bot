@@ -4,6 +4,7 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from servicos.pega_corrida import pega_corrida
 from comandos.mensagens import (
     ERRO_CONSULTA,
+    HORARIOS_INDEFINIDOS,
     NOTIFICACOES_REMOVIDAS,
     lembrete,
     lista_notificacoes,
@@ -43,11 +44,15 @@ async def enviar_lembrete(chat_id, thread_id, evento_nome, minutos):
     )
 
 def adiciona_lembrete(chat_id, thread_id, evento):
+    dia_hora = evento.dia_hora_datetime()
+    if dia_hora is None:
+        return
+
     for minutos in REMINDER_MINUTES:
         scheduler.add_job(
             enviar_lembrete,
             'date',
-            run_date=evento.dia_hora_datetime() - timedelta(minutes=minutos),
+            run_date=dia_hora - timedelta(minutes=minutos),
             args=[chat_id, thread_id, evento.nome, minutos],
             id=f'{evento.nome}_{evento.dia_hora()}_{minutos}min{chat_id}',
             misfire_grace_time=20,
@@ -73,6 +78,11 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not corrida.sprint:
         lista_eventos.append(corrida.fp2)
         lista_eventos.append(corrida.fp3)
+
+    lista_eventos = [evento for evento in lista_eventos if evento.tem_horario]
+    if not lista_eventos:
+        await update.message.reply_text(HORARIOS_INDEFINIDOS)
+        return
 
     for evento in lista_eventos:
         try:
