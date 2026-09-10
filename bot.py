@@ -7,7 +7,7 @@ from comandos.notify import (
     notify,
 )
 from comandos.next import next
-from comandos.calendar import calendar
+from comandos.calendar import calendar, calendar_callback
 from comandos.countdown import countdown
 from comandos.about import about
 from comandos.help import help_command
@@ -49,6 +49,7 @@ def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("next", next))
     application.add_handler(CommandHandler("calendar", calendar))
+    application.add_handler(CallbackQueryHandler(calendar_callback, pattern="^calendar:"))
     application.add_handler(CommandHandler("countdown", countdown))
     application.add_handler(CommandHandler("about", about))
     application.add_handler(CommandHandler("help", help_command))

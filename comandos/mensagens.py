@@ -125,7 +125,7 @@ def nenhum_evento_futuro(corrida_nome):
     return f"🏁 Não há mais sessões futuras em <b>{escape(corrida_nome)}</b>."
 
 
-def calendario_temporada(corridas, ano):
+def calendario_temporada(corridas, ano, pagina=1, total_paginas=1):
     dias_da_semana = (
         "segunda-feira",
         "terça-feira",
@@ -135,7 +135,10 @@ def calendario_temporada(corridas, ano):
         "sábado",
         "domingo",
     )
-    linhas = [f"🗓 <b>Calendário da Fórmula 1 — {ano}</b>", ""]
+    titulo = f"🗓 <b>Calendário da Fórmula 1 — {ano}</b>"
+    if total_paginas > 1:
+        titulo += f"\nPágina {pagina} de {total_paginas}"
+    linhas = [titulo, ""]
 
     for corrida in corridas:
         nome = escape(corrida["raceName"])
