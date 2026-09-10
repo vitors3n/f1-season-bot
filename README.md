@@ -95,8 +95,8 @@ docker compose -f docker/docker-compose.yml stop f1bot
 | `/teams` | Classificação dos construtores. |
 | `/notify` | Ativa lembretes para o próximo GP. |
 | `/listnotify` | Lista os lembretes deste chat. |
-| `/clearnotify` | Remove os lembretes deste chat. |
-| `/settings` | Configura as sessões que este chat receberá nos lembretes. |
+| `/clearnotify` | Remove os lembretes deste chat; em grupos, apenas administradores podem usar. |
+| `/settings` | Configura as sessões que este chat receberá nos lembretes; em grupos, apenas administradores podem usar. |
 | `/help` | Lista todos os comandos. |
 | `/about` | Informações sobre o bot. |
 

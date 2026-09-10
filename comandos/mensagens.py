@@ -39,8 +39,8 @@ AJUDA = f"""🏎️ <b>Ajuda — F1 Season Bot</b>
 <b>Notificações</b>
 /notify — Ativa lembretes para as sessões da próxima corrida.
 /listnotify — Lista os lembretes ativos neste chat.
-/clearnotify — Remove os lembretes deste chat.
-/settings — Configura os lembretes deste chat.
+/clearnotify — Remove os lembretes deste chat (administradores em grupos).
+/settings — Configura os lembretes deste chat (administradores em grupos).
 
 <b>Outros</b>
 /start — Exibe a mensagem inicial.
@@ -125,7 +125,7 @@ def nenhum_evento_futuro(corrida_nome):
     return f"🏁 Não há mais sessões futuras em <b>{escape(corrida_nome)}</b>."
 
 
-def calendario_temporada(corridas, ano):
+def calendario_temporada(corridas, ano, pagina=1, total_paginas=1):
     dias_da_semana = (
         "segunda-feira",
         "terça-feira",
@@ -135,7 +135,10 @@ def calendario_temporada(corridas, ano):
         "sábado",
         "domingo",
     )
-    linhas = [f"🗓 <b>Calendário da Fórmula 1 — {ano}</b>", ""]
+    titulo = f"🗓 <b>Calendário da Fórmula 1 — {ano}</b>"
+    if total_paginas > 1:
+        titulo += f"\nPágina {pagina} de {total_paginas}"
+    linhas = [titulo, ""]
 
     for corrida in corridas:
         nome = escape(corrida["raceName"])
