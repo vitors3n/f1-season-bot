@@ -39,8 +39,8 @@ AJUDA = f"""🏎️ <b>Ajuda — F1 Season Bot</b>
 <b>Notificações</b>
 /notify — Ativa lembretes para as sessões da próxima corrida.
 /listnotify — Lista os lembretes ativos neste chat.
-/clearnotify — Remove os lembretes deste chat.
-/settings — Configura os lembretes deste chat.
+/clearnotify — Remove os lembretes deste chat (administradores em grupos).
+/settings — Configura os lembretes deste chat (administradores em grupos).
 
 <b>Outros</b>
 /start — Exibe a mensagem inicial.

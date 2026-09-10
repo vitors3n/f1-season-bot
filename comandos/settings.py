@@ -8,6 +8,7 @@ from servicos.configuracoes import (
     obter_configuracoes,
     restaurar_configuracoes,
 )
+from servicos.permissoes import exigir_administrador
 
 
 NOMES_SESSOES = {
@@ -35,6 +36,9 @@ def _teclado(configuracoes, mostrar_sessoes=False):
 
 
 async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await exigir_administrador(update, context):
+        return
+
     configuracoes = obter_configuracoes(update.effective_chat.id)
     await update.message.reply_text(
         configuracoes_chat(configuracoes), parse_mode="HTML", reply_markup=_teclado(configuracoes)
@@ -43,6 +47,9 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def settings_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
+    if not await exigir_administrador(update, context):
+        return
+
     await query.answer()
     chat_id = update.effective_chat.id
     acao, *argumentos = query.data.split(":")[1:]

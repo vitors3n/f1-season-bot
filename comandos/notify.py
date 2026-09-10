@@ -17,6 +17,7 @@ from telegram import Bot
 from config import BOT_TOKEN, DATABASE_URL, REMINDER_MINUTES
 from modelos.corrida import TIMEZONE_PADRAO
 from servicos.configuracoes import obter_configuracoes
+from servicos.permissoes import exigir_administrador
 
 bot = Bot(token=BOT_TOKEN)
 
@@ -101,6 +102,9 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Job ID: {job.id}, próxima run: {job.next_run_time}")
 
 async def clear_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await exigir_administrador(update, context):
+        return
+
     chat_id = update.effective_chat.id
 
     for job in scheduler.get_jobs():
