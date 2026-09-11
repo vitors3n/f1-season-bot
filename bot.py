@@ -18,6 +18,7 @@ from comandos.teams import teams
 from comandos.settings import settings, settings_callback
 from comandos.mensagens import MENSAGEM_INICIAL
 from config import BOT_TOKEN, LOG_LEVEL
+from servicos.http_client import encerrar_http_client, iniciar_http_client
 from telegram import Update
 import logging
 
@@ -32,11 +33,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def iniciar_aplicacao(application):
+    await iniciar_http_client()
     iniciar_scheduler()
 
 
 async def encerrar_aplicacao(application):
     encerrar_scheduler()
+    await encerrar_http_client()
 
 def main():
     application = (
