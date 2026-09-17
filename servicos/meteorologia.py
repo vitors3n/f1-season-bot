@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from diskcache import Cache
@@ -7,6 +8,7 @@ from servicos.http_client import busca_json
 
 
 cache = Cache(CACHE_DIRECTORY)
+logger = logging.getLogger(__name__)
 
 
 async def pega_previsao(latitude, longitude):
@@ -14,7 +16,7 @@ async def pega_previsao(latitude, longitude):
     data = cache.get(cache_key)
 
     if data is not None:
-        print("~ Usando cache ~")
+        logger.debug("Previsão meteorológica obtida do cache")
         return data
 
     parametros = {
@@ -35,7 +37,7 @@ async def pega_previsao(latitude, longitude):
     if data is None:
         return None
     cache.set(cache_key, data, expire=CACHE_TTL_WEATHER)
-    print("~ Usando API ~")
+    logger.info("Previsão meteorológica atualizada pela API")
     return data
 
 

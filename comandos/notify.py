@@ -1,3 +1,5 @@
+import logging
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.base import ConflictingIdError
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -26,16 +28,19 @@ lembretes = {
 }
 
 scheduler = AsyncIOScheduler(jobstores=lembretes, timezone=TIMEZONE_PADRAO)
+logger = logging.getLogger(__name__)
 
 
 def iniciar_scheduler():
     if not scheduler.running:
         scheduler.start()
+        logger.info("Scheduler de lembretes iniciado")
 
 
 def encerrar_scheduler():
     if scheduler.running:
         scheduler.shutdown(wait=False)
+        logger.info("Scheduler de lembretes encerrado")
 
 async def enviar_lembrete(chat_id, thread_id, evento_nome, minutos):
     await bot.send_message(
@@ -61,8 +66,6 @@ def adiciona_lembrete(chat_id, thread_id, evento, minutos_lembrete=REMINDER_MINU
         )
 
 async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    jobs = scheduler.get_jobs()
-
     chat_id = update.message.chat.id
     thread_id = update.message.message_thread_id
 
@@ -92,14 +95,18 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             adiciona_lembrete(chat_id, thread_id, evento, configuracoes["reminder_minutes"])
         except ConflictingIdError:
-            print('Job já existe... Ignorando...')
+            logger.info("Lembrete já existe e foi ignorado: chat_id=%s, evento=%s", chat_id, evento.nome)
     await update.message.reply_text(
         notificacoes_ativadas(corrida.nome),
         parse_mode='HTML',
     )
 
-    for job in jobs:
-        print(f"Job ID: {job.id}, próxima run: {job.next_run_time}")
+    logger.info(
+        "Lembretes processados: chat_id=%s, eventos=%s, jobs_ativos=%s",
+        chat_id,
+        len(lista_eventos),
+        len(scheduler.get_jobs()),
+    )
 
 async def clear_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await exigir_administrador(update, context):
@@ -107,9 +114,13 @@ async def clear_notify(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     chat_id = update.effective_chat.id
 
+    removidos = 0
     for job in scheduler.get_jobs():
         if job.args and job.args[0] == chat_id:
             job.remove()
+            removidos += 1
+
+    logger.info("Lembretes removidos: chat_id=%s, quantidade=%s", chat_id, removidos)
 
     await update.message.reply_text(NOTIFICACOES_REMOVIDAS)
 
