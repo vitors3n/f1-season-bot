@@ -1,6 +1,9 @@
+import os
 import unittest
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
+
+os.environ["BOT_TOKEN"] = os.getenv("BOT_TOKEN") or "123456:TESTE"
 
 import httpx
 
@@ -65,4 +68,3 @@ class ApiIndisponivelTest(unittest.IsolatedAsyncioTestCase):
             resposta = await http_client.busca_json("https://api.exemplo.test/dados")
 
         self.assertIsNone(resposta)
-
