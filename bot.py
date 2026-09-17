@@ -35,11 +35,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def iniciar_aplicacao(application):
     await iniciar_http_client()
     iniciar_scheduler()
+    logger.info("Bot iniciado")
 
 
 async def encerrar_aplicacao(application):
     encerrar_scheduler()
     await encerrar_http_client()
+    logger.info("Bot encerrado")
 
 def main():
     application = (

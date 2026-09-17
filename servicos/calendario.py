@@ -1,9 +1,12 @@
+import logging
+
 from diskcache import Cache
 from config import CACHE_DIRECTORY, CACHE_TTL_CALENDAR
 from servicos.http_client import busca_json
 
 
 cache = Cache(CACHE_DIRECTORY)
+logger = logging.getLogger(__name__)
 
 
 async def pega_calendario():
@@ -11,12 +14,12 @@ async def pega_calendario():
     data = cache.get(url)
 
     if data is not None:
-        print("~ Usando cache ~")
+        logger.debug("Calendário obtido do cache")
     else:
         data = await busca_json(url)
         if data is None:
             return None
         cache.set(url, data, expire=CACHE_TTL_CALENDAR)
-        print("~ Usando API ~")
+        logger.info("Calendário atualizado pela API")
 
     return data["MRData"]["RaceTable"]["Races"]

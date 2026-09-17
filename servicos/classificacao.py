@@ -1,9 +1,12 @@
+import logging
+
 from diskcache import Cache
 from config import CACHE_DIRECTORY, CACHE_TTL_QUALIFYING
 from servicos.http_client import busca_json
 
 
 cache = Cache(CACHE_DIRECTORY)
+logger = logging.getLogger(__name__)
 
 
 async def pega_ultima_classificacao():
@@ -11,13 +14,13 @@ async def pega_ultima_classificacao():
     data = cache.get(url)
 
     if data is not None:
-        print("~ Usando cache ~")
+        logger.debug("Última classificação obtida do cache")
     else:
         data = await busca_json(url)
         if data is None:
             return None
         cache.set(url, data, expire=CACHE_TTL_QUALIFYING)
-        print("~ Usando API ~")
+        logger.info("Última classificação atualizada pela API")
 
     corridas = data.get("MRData", {}).get("RaceTable", {}).get("Races", [])
     return corridas[0] if corridas else None

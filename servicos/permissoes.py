@@ -1,7 +1,11 @@
+import logging
+
 from telegram.constants import ChatMemberStatus, ChatType
 from telegram.error import TelegramError
 
 from comandos.mensagens import NAO_AUTORIZADO
+
+logger = logging.getLogger(__name__)
 
 
 async def pode_gerenciar_chat(update, context):
@@ -11,7 +15,8 @@ async def pode_gerenciar_chat(update, context):
 
     try:
         membro = await context.bot.get_chat_member(chat.id, update.effective_user.id)
-    except TelegramError:
+    except TelegramError as erro:
+        logger.warning("Não foi possível verificar permissões no chat %s: %s", chat.id, erro)
         return False
 
     return membro.status in (ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER)
