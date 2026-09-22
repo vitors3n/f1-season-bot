@@ -6,6 +6,7 @@ from config import DEFAULT_TIMEZONE, REMINDER_MINUTES, SETTINGS_DATABASE_PATH
 
 
 SESSOES_PADRAO = ("fp1", "fp2", "fp3", "sprint_quali", "sprint", "quali", "race")
+ANTECEDENCIAS_DISPONIVEIS = (60, 30, 15, 10, 5)
 
 
 def _conexao():
@@ -86,6 +87,23 @@ def alternar_sessao(chat_id, sessao):
         sessoes.add(sessao)
     configuracoes["sessions"] = tuple(
         item for item in SESSOES_PADRAO if item in sessoes
+    )
+    salvar_configuracoes(chat_id, configuracoes)
+    return configuracoes
+
+
+def alternar_antecedencia(chat_id, minutos):
+    configuracoes = obter_configuracoes(chat_id)
+    if minutos not in ANTECEDENCIAS_DISPONIVEIS:
+        return configuracoes
+
+    antecedentes = set(configuracoes["reminder_minutes"])
+    if minutos in antecedentes and len(antecedentes) > 1:
+        antecedentes.remove(minutos)
+    else:
+        antecedentes.add(minutos)
+    configuracoes["reminder_minutes"] = tuple(
+        item for item in ANTECEDENCIAS_DISPONIVEIS if item in antecedentes
     )
     salvar_configuracoes(chat_id, configuracoes)
     return configuracoes
