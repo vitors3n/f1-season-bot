@@ -265,10 +265,10 @@ def lista_notificacoes(nomes):
     return f"🔔 <b>Notificações ativas neste chat:</b>\n\n{itens}"
 
 
-def configuracoes_chat(configuracoes, mostrar_sessoes=False):
+def configuracoes_chat(configuracoes, tela="inicio"):
     minutos = " e ".join(str(minuto) for minuto in configuracoes["reminder_minutes"])
     sessoes = configuracoes["sessions"]
-    if mostrar_sessoes:
+    if tela == "sessoes":
         descricao = "Escolha quais sessões receberão lembretes."
     elif len(sessoes) == 7:
         descricao = "Todas"
@@ -282,6 +282,8 @@ def configuracoes_chat(configuracoes, mostrar_sessoes=False):
         f"🏁 Sessões: {descricao}\n"
         "🌐 Idioma: Português\n\n"
     )
-    if mostrar_sessoes:
+    if tela == "sessoes":
         return texto + "Escolha as sessões abaixo:"
+    if tela == "antecedencias":
+        return texto + "Escolha os minutos de antecedência abaixo:"
     return texto + "Use os botões abaixo para alterar as sessões dos próximos lembretes."
