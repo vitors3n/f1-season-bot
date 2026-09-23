@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0f1014">
+    <title>F1 Season</title>
+    <link rel="stylesheet" href="app.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  </head>
+  <body>
+    <main class="dashboard">
+      <header><p class="eyebrow">F1 SEASON</p><h1>Próximo GP</h1></header>
+      <section class="race-card" aria-live="polite">
+        <div class="flag" aria-hidden="true">🏁</div>
+        <p id="status" class="status">Carregando corrida...</p>
+        <div id="race-content" hidden>
+          <p class="label">PRÓXIMA CORRIDA</p><h2 id="race-name"></h2><p id="circuit" class="circuit"></p>
+          <div class="race-time"><span>Corrida</span><strong id="race-date"></strong></div>
+        </div>
+      </section>
+      <section id="schedule-section" hidden><h2>Programação do fim de semana</h2><ul id="schedule" class="schedule"></ul></section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

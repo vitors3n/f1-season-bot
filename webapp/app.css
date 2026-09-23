@@ -1,0 +1,14 @@
+:root { color-scheme: dark; --background: var(--tg-theme-bg-color, #0f1014); --surface: var(--tg-theme-secondary-bg-color, #1b1d24); --text: var(--tg-theme-text-color, #f5f5f5); --hint: var(--tg-theme-hint-color, #a1a6b3); --accent: var(--tg-theme-button-color, #e10600); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--text); font-family: Inter, Arial, sans-serif; }
+.dashboard { max-width: 620px; margin: auto; padding: 28px 20px 36px; }
+header { margin-bottom: 24px; }
+.eyebrow, .label { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .12em; margin: 0 0 6px; }
+h1 { font-size: 32px; margin: 0; } h2 { font-size: 20px; margin: 0; }
+.race-card { position: relative; overflow: hidden; min-height: 216px; padding: 24px; border-radius: 20px; background: linear-gradient(135deg, #2a1012, var(--surface)); }
+.race-card::after { background: var(--accent); content: ""; height: 100%; opacity: .8; position: absolute; right: 0; top: 0; width: 5px; }
+.flag { font-size: 38px; margin-bottom: 26px; }.status { color: var(--hint); margin: 58px 0; text-align: center; }
+#race-name { font-size: 27px; line-height: 1.12; }.circuit { color: var(--hint); margin: 7px 0 22px; }
+.race-time { border-top: 1px solid #ffffff24; display: flex; justify-content: space-between; padding-top: 16px; }.race-time span { color: var(--hint); }
+section + section { margin-top: 30px; }.schedule { list-style: none; margin: 14px 0 0; padding: 0; }
+.schedule li { background: var(--surface); border-radius: 12px; display: flex; gap: 12px; justify-content: space-between; margin-bottom: 8px; padding: 14px; }.schedule li span { color: var(--hint); text-align: right; }

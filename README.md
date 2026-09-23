@@ -60,6 +60,26 @@ Você precisa apenas de um token de bot do Telegram e de Python 3.10 ou superior
 
 > Nunca envie o arquivo `.env` ao Git. Ele já está listado no `.gitignore`.
 
+## Dashboard (Telegram Mini App)
+
+O exemplo de dashboard mostra o próximo GP e a programação do fim de semana. Ele reutiliza a mesma API e cache do bot, sem dependências adicionais.
+
+Em desenvolvimento, inicie-o em outro terminal:
+
+```bash
+python webapp.py
+```
+
+Para abri-lo pelo botão exibido no `/start`, publique o servidor por HTTPS e informe a URL pública no `.env`:
+
+```env
+WEB_APP_URL=https://app.seu-dominio.com/
+```
+
+No Apache, faça o proxy dessa URL para `http://127.0.0.1:8000/`. O endereço HTTPS também precisa ser configurado como Mini App no BotFather.
+
+No deploy com Docker Compose, o serviço `f1web` é iniciado junto com o bot e expõe a porta somente no `127.0.0.1` do servidor, para uso pelo Apache.
+
 ## Executar com Docker
 
 O Compose usa volumes para preservar o banco de lembretes e o cache entre atualizações. Antes de iniciar, ajuste os caminhos do host em `docker/docker-compose.yml` caso o servidor não use `/projetos/f1bot`.

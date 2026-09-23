@@ -17,9 +17,9 @@ from comandos.drivers import drivers
 from comandos.teams import teams
 from comandos.settings import settings, settings_callback
 from comandos.mensagens import MENSAGEM_INICIAL
-from config import BOT_TOKEN, LOG_LEVEL
+from config import BOT_TOKEN, LOG_LEVEL, WEB_APP_URL
 from servicos.http_client import encerrar_http_client, iniciar_http_client
-from telegram import Update
+from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo
 import logging
 
 logging.basicConfig(
@@ -29,7 +29,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(MENSAGEM_INICIAL, parse_mode='HTML')
+    teclado = None
+    if WEB_APP_URL:
+        teclado = ReplyKeyboardMarkup(
+            [[KeyboardButton("🏎️ Abrir dashboard", web_app=WebAppInfo(WEB_APP_URL))]],
+            resize_keyboard=True,
+        )
+    await update.message.reply_text(
+        MENSAGEM_INICIAL,
+        parse_mode='HTML',
+        reply_markup=teclado,
+    )
 
 
 async def iniciar_aplicacao(application):
