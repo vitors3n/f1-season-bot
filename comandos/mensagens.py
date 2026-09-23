@@ -11,6 +11,7 @@ Acompanhe a temporada de Fórmula 1 diretamente pelo Telegram.
 
 <b>Comandos disponíveis:</b>
 /next — Próxima corrida e horários
+/dashboard — Abrir dashboard do próximo GP
 /countdown — Contagem regressiva para a próxima sessão
 /calendar — Calendário da temporada
 /qualifying — Resultado da última classificação
@@ -27,6 +28,7 @@ AJUDA = f"""🏎️ <b>Ajuda — F1 Season Bot</b>
 
 <b>Corridas</b>
 /next — Exibe a próxima corrida e a programação do fim de semana.
+/dashboard — Abre o dashboard visual do próximo GP.
 /countdown — Mostra quanto falta para a próxima sessão.
 /calendar — Lista as corridas da temporada atual.
 /qualifying — Mostra o resultado da última classificação.
