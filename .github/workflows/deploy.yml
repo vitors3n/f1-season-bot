@@ -34,5 +34,6 @@ jobs:
       - name: Build and deploy f1bot
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          WEB_APP_URL: ${{ vars.WEB_APP_URL }}
         run: |
           docker compose -f docker/docker-compose.yml up -d --build --remove-orphans

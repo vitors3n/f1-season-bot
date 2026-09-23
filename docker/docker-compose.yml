@@ -7,6 +7,7 @@ services:
     restart: unless-stopped
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
+      WEB_APP_URL: ${WEB_APP_URL}
       TZ: America/Sao_Paulo
     volumes:
       - /projetos/f1bot/data:/usr/src/f1-bot/data
@@ -14,3 +15,20 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
     command: python bot.py
+
+  f1web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: f1web
+    restart: unless-stopped
+    environment:
+      WEB_APP_HOST: 0.0.0.0
+      TZ: America/Sao_Paulo
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - /projetos/f1bot/jolpi_cache:/usr/src/f1-bot/jolpi_cache
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    command: python webapp.py
