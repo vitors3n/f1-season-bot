@@ -16,10 +16,11 @@ from comandos.weather import weather
 from comandos.drivers import drivers
 from comandos.teams import teams
 from comandos.settings import settings, settings_callback
+from comandos.dashboard import dashboard, teclado_dashboard
 from comandos.mensagens import MENSAGEM_INICIAL
 from config import BOT_TOKEN, LOG_LEVEL, WEB_APP_URL
 from servicos.http_client import encerrar_http_client, iniciar_http_client
-from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo
+from telegram import MenuButtonWebApp, Update, WebAppInfo
 import logging
 
 logging.basicConfig(
@@ -29,22 +30,23 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    teclado = None
-    if WEB_APP_URL:
-        teclado = ReplyKeyboardMarkup(
-            [[KeyboardButton("🏎️ Abrir dashboard", web_app=WebAppInfo(WEB_APP_URL))]],
-            resize_keyboard=True,
-        )
     await update.message.reply_text(
         MENSAGEM_INICIAL,
         parse_mode='HTML',
-        reply_markup=teclado,
+        reply_markup=teclado_dashboard(update.effective_chat.type),
     )
 
 
 async def iniciar_aplicacao(application):
     await iniciar_http_client()
     iniciar_scheduler()
+    if WEB_APP_URL:
+        await application.bot.set_chat_menu_button(
+            menu_button=MenuButtonWebApp(
+                text="Dashboard F1",
+                web_app=WebAppInfo(WEB_APP_URL),
+            )
+        )
     logger.info("Bot iniciado")
 
 
@@ -62,6 +64,7 @@ def main():
         .build()
     )
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("dashboard", dashboard))
     application.add_handler(CommandHandler("next", next))
     application.add_handler(CommandHandler("calendar", calendar))
     application.add_handler(CallbackQueryHandler(calendar_callback, pattern="^calendar:"))

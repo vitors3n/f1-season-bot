@@ -107,6 +107,7 @@ docker compose -f docker/docker-compose.yml stop f1bot
 | Comando | Descrição |
 | --- | --- |
 | `/next` | Próxima corrida e programação do fim de semana. |
+| `/dashboard` | Abre o dashboard visual do próximo GP. |
 | `/countdown` | Tempo restante para a próxima sessão. |
 | `/calendar` | Calendário da temporada atual. |
 | `/qualifying` | Resultado da última classificação. |
