@@ -80,6 +80,10 @@ No Apache, faça o proxy dessa URL para `http://127.0.0.1:8000/`. O endereço HT
 
 No deploy com Docker Compose, o serviço `f1web` é iniciado junto com o bot e expõe a porta somente no `127.0.0.1` do servidor, para uso pelo Apache.
 
+O dashboard exige autenticação pelo Telegram: abra-o pelo botão no chat privado com o bot. O servidor valida os dados assinados do Mini App antes de liberar suas APIs.
+
+Usuários autenticados podem registrar uma previsão ordenada dos cinco primeiros colocados da próxima corrida. A previsão pode ser alterada até 30 minutos antes da largada; esse bloqueio também é validado pelo servidor.
+
 ## Executar com Docker
 
 O Compose usa volumes para preservar o banco de lembretes e o cache entre atualizações. Antes de iniciar, ajuste os caminhos do host em `docker/docker-compose.yml` caso o servidor não use `/projetos/f1bot`.
