@@ -16,7 +16,7 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urlparse
 
 from config import BOT_TOKEN
-from servicos.http_client import encerrar_http_client
+from servicos.http_client import busca_json, encerrar_http_client
 from servicos.pega_corrida import pega_corrida
 from servicos.campeonato_pilotos import campeonato_pilotos
 
@@ -29,6 +29,11 @@ AUTH_DATABASE_PATH = os.getenv("WEB_APP_DATABASE_PATH", "data/webapp.sqlite")
 SESSION_TTL_SECONDS = int(os.getenv("WEB_APP_SESSION_TTL", str(7 * 24 * 60 * 60)))
 INIT_DATA_MAX_AGE_SECONDS = int(os.getenv("WEB_APP_INIT_DATA_MAX_AGE", "86400"))
 COOKIE_SECURE = os.getenv("WEB_APP_COOKIE_SECURE", "1") == "1"
+ADMIN_TELEGRAM_IDS = frozenset(
+    int(item.strip())
+    for item in os.getenv("ADMIN_TELEGRAM_IDS", "101343650").split(",")
+    if item.strip()
+)
 
 
 def montar_proxima_corrida(corrida):
@@ -84,6 +89,14 @@ def inicializar_banco():
                 updated_at INTEGER NOT NULL,
                 PRIMARY KEY (race_key, telegram_id, position),
                 FOREIGN KEY (telegram_id) REFERENCES webapp_users (telegram_id)
+            );
+            CREATE TABLE IF NOT EXISTS top5_results (
+                race_key TEXT NOT NULL,
+                position INTEGER NOT NULL CHECK(position BETWEEN 1 AND 5),
+                driver_id TEXT NOT NULL,
+                updated_by INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL,
+                PRIMARY KEY (race_key, position)
             );
         """)
     finally:
@@ -178,6 +191,16 @@ async def obter_dados_top5():
         await encerrar_http_client()
 
 
+async def obter_dados_admin():
+    try:
+        dados = await busca_json("https://api.jolpi.ca/ergast/f1/current/last/results.json")
+        corridas = dados.get("MRData", {}).get("RaceTable", {}).get("Races", []) if dados else []
+        pilotos = await campeonato_pilotos()
+        return (corridas[0] if corridas else None), pilotos
+    finally:
+        await encerrar_http_client()
+
+
 def chave_corrida(corrida):
     return f"{corrida.dia}:{corrida.nome}"
 
@@ -252,6 +275,51 @@ def resposta_top5(usuario, corrida, pilotos):
     }
 
 
+def usuario_e_admin(usuario):
+    return usuario["telegram_id"] in ADMIN_TELEGRAM_IDS
+
+
+def chave_corrida_api(corrida):
+    return f'{corrida["date"]}:{corrida["raceName"]}'
+
+
+def carregar_resultado_top5(corrida):
+    conexao = sqlite3.connect(AUTH_DATABASE_PATH)
+    try:
+        linhas = conexao.execute(
+            "SELECT driver_id FROM top5_results WHERE race_key = ? ORDER BY position",
+            (chave_corrida_api(corrida),),
+        ).fetchall()
+    finally:
+        conexao.close()
+    return [linha[0] for linha in linhas]
+
+
+def salvar_resultado_top5(admin_id, corrida, pilotos):
+    if len(pilotos) != 5 or len(set(pilotos)) != 5:
+        raise ValueError("Escolha cinco pilotos diferentes.")
+    agora = int(time.time())
+    conexao = sqlite3.connect(AUTH_DATABASE_PATH)
+    try:
+        conexao.execute("DELETE FROM top5_results WHERE race_key = ?", (chave_corrida_api(corrida),))
+        conexao.executemany(
+            """INSERT INTO top5_results (race_key, position, driver_id, updated_by, updated_at)
+               VALUES (?, ?, ?, ?, ?)""",
+            [(chave_corrida_api(corrida), posicao, piloto, admin_id, agora) for posicao, piloto in enumerate(pilotos, 1)],
+        )
+        conexao.commit()
+    finally:
+        conexao.close()
+
+
+def resposta_admin(corrida, pilotos):
+    return {
+        "corrida": {"nome": corrida["raceName"], "data": corrida["date"]},
+        "pilotos": serializar_pilotos(pilotos),
+        "resultado": carregar_resultado_top5(corrida),
+    }
+
+
 class DashboardHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         caminho = urlparse(self.path).path
@@ -259,6 +327,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self._responder_usuario()
         elif caminho == "/api/top5":
             self._responder_top5()
+        elif caminho == "/api/admin/top5":
+            self._responder_admin_top5()
         elif caminho == "/api/proxima-corrida":
             self._responder_proxima_corrida()
         elif caminho in ("/", "/index.html"):
@@ -274,6 +344,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         caminho = urlparse(self.path).path
         if caminho == "/api/top5":
             self._salvar_top5()
+            return
+        if caminho == "/api/admin/top5":
+            self._salvar_admin_top5()
             return
         if caminho != "/api/auth/telegram":
             self.send_error(HTTPStatus.NOT_FOUND)
@@ -330,6 +403,27 @@ class DashboardHandler(BaseHTTPRequestHandler):
             LOGGER.exception("Falha ao carregar a previsão Top 5")
             self._enviar_json({"erro": "Não foi possível carregar o Top 5 agora."}, HTTPStatus.BAD_GATEWAY)
 
+    def _usuario_admin(self):
+        usuario = self._usuario_autenticado()
+        if usuario and not usuario_e_admin(usuario):
+            self._enviar_json({"erro": "Acesso administrativo nao autorizado."}, HTTPStatus.FORBIDDEN)
+            return None
+        return usuario
+
+    def _responder_admin_top5(self):
+        if not self._usuario_admin():
+            return
+        try:
+            corrida, pilotos = asyncio.run(obter_dados_admin())
+            if corrida is None or pilotos is None:
+                raise ValueError("Nao foi possivel carregar a ultima corrida.")
+            self._enviar_json(resposta_admin(corrida, pilotos))
+        except ValueError as erro:
+            self._enviar_json({"erro": str(erro)}, HTTPStatus.BAD_GATEWAY)
+        except Exception:
+            LOGGER.exception("Falha ao carregar a area administrativa")
+            self._enviar_json({"erro": "Nao foi possivel carregar a area administrativa."}, HTTPStatus.BAD_GATEWAY)
+
     def _salvar_top5(self):
         usuario = self._usuario_autenticado()
         if not usuario:
@@ -355,6 +449,30 @@ class DashboardHandler(BaseHTTPRequestHandler):
         except Exception:
             LOGGER.exception("Falha ao salvar a previsão Top 5")
             self._enviar_json({"erro": "Não foi possível salvar o Top 5 agora."}, HTTPStatus.BAD_GATEWAY)
+
+    def _salvar_admin_top5(self):
+        usuario = self._usuario_admin()
+        if not usuario:
+            return
+        try:
+            tamanho = int(self.headers.get("Content-Length", "0"))
+            corpo = json.loads(self.rfile.read(tamanho))
+            escolhidos = corpo["pilotos"]
+            if not isinstance(escolhidos, list) or not all(isinstance(item, str) for item in escolhidos):
+                raise ValueError("Resultado invalido.")
+            corrida, pilotos = asyncio.run(obter_dados_admin())
+            if corrida is None or pilotos is None:
+                raise ValueError("Nao foi possivel carregar a ultima corrida.")
+            pilotos_disponiveis = {piloto["id"] for piloto in serializar_pilotos(pilotos)}
+            if not set(escolhidos).issubset(pilotos_disponiveis):
+                raise ValueError("Um ou mais pilotos nao sao validos.")
+            salvar_resultado_top5(usuario["telegram_id"], corrida, escolhidos)
+            self._enviar_json(resposta_admin(corrida, pilotos))
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as erro:
+            self._enviar_json({"erro": str(erro)}, HTTPStatus.BAD_REQUEST)
+        except Exception:
+            LOGGER.exception("Falha ao salvar o resultado Top 5")
+            self._enviar_json({"erro": "Nao foi possivel salvar o resultado agora."}, HTTPStatus.BAD_GATEWAY)
 
     def _enviar_arquivo(self, nome, content_type):
         conteudo = (STATIC_DIRECTORY / nome).read_bytes()

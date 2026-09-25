@@ -60,6 +60,15 @@ class WebAppAuthTest(unittest.TestCase):
         with self.assertRaises(PermissionError):
             webapp.salvar_top5(123, corrida, ["a", "b", "c", "d", "e"])
 
+    def test_admin_padrao_pode_salvar_resultado_top5(self):
+        corrida = {"date": "2026-12-01", "raceName": "GP de Teste"}
+        pilotos = ["a", "b", "c", "d", "e"]
+
+        self.assertTrue(webapp.usuario_e_admin({"telegram_id": 101343650}))
+        webapp.salvar_resultado_top5(101343650, corrida, pilotos)
+
+        self.assertEqual(webapp.carregar_resultado_top5(corrida), pilotos)
+
 
 class CorridaFalsa:
     dia = "2026-12-01"
