@@ -98,6 +98,13 @@ def inicializar_banco():
                 updated_at INTEGER NOT NULL,
                 PRIMARY KEY (race_key, position)
             );
+            CREATE TABLE IF NOT EXISTS top5_scores (
+                race_key TEXT NOT NULL,
+                telegram_id INTEGER NOT NULL,
+                points INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL,
+                PRIMARY KEY (race_key, telegram_id)
+            );
         """)
     finally:
         conexao.close()
@@ -272,6 +279,7 @@ def resposta_top5(usuario, corrida, pilotos):
         "aberto": top5_aberto(corrida),
         "pilotos": serializar_pilotos(pilotos),
         "previsao": carregar_top5(usuario["telegram_id"], corrida),
+        "pontuacao_total": pontuacao_usuario(usuario["telegram_id"]),
     }
 
 
@@ -295,6 +303,28 @@ def carregar_resultado_top5(corrida):
     return [linha[0] for linha in linhas]
 
 
+def calcular_pontos(previsao, resultado):
+    pontos = 0
+    for posicao, piloto in enumerate(previsao):
+        if piloto == resultado[posicao]:
+            pontos += 20
+        elif piloto in resultado:
+            pontos += 5
+    return pontos
+
+
+def pontuacao_usuario(telegram_id):
+    conexao = sqlite3.connect(AUTH_DATABASE_PATH)
+    try:
+        linha = conexao.execute(
+            "SELECT COALESCE(SUM(points), 0) FROM top5_scores WHERE telegram_id = ?",
+            (telegram_id,),
+        ).fetchone()
+    finally:
+        conexao.close()
+    return linha[0]
+
+
 def salvar_resultado_top5(admin_id, corrida, pilotos):
     if len(pilotos) != 5 or len(set(pilotos)) != 5:
         raise ValueError("Escolha cinco pilotos diferentes.")
@@ -306,6 +336,22 @@ def salvar_resultado_top5(admin_id, corrida, pilotos):
             """INSERT INTO top5_results (race_key, position, driver_id, updated_by, updated_at)
                VALUES (?, ?, ?, ?, ?)""",
             [(chave_corrida_api(corrida), posicao, piloto, admin_id, agora) for posicao, piloto in enumerate(pilotos, 1)],
+        )
+        linhas = conexao.execute(
+            """SELECT telegram_id, position, driver_id FROM top5_predictions
+               WHERE race_key = ? ORDER BY telegram_id, position""",
+            (chave_corrida_api(corrida),),
+        ).fetchall()
+        previsoes = {}
+        for telegram_id, _, piloto in linhas:
+            previsoes.setdefault(telegram_id, []).append(piloto)
+        conexao.execute("DELETE FROM top5_scores WHERE race_key = ?", (chave_corrida_api(corrida),))
+        conexao.executemany(
+            "INSERT INTO top5_scores (race_key, telegram_id, points, updated_at) VALUES (?, ?, ?, ?)",
+            [
+                (chave_corrida_api(corrida), telegram_id, calcular_pontos(previsao, pilotos), agora)
+                for telegram_id, previsao in previsoes.items()
+            ],
         )
         conexao.commit()
     finally:

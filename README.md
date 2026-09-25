@@ -84,6 +84,8 @@ O dashboard exige autenticação pelo Telegram: abra-o pelo botão no chat priva
 
 Usuários autenticados podem registrar uma previsão ordenada dos cinco primeiros colocados da próxima corrida. A previsão pode ser alterada até 30 minutos antes da largada; esse bloqueio também é validado pelo servidor.
 
+Após o Top 5 oficial ser registrado pela administração, cada piloto na posição exata vale 20 pontos; um piloto presente no Top 5, mas em posição diferente, vale 5 pontos.
+
 A área administrativa aparece apenas para IDs configurados em `ADMIN_TELEGRAM_IDS` (por padrão, `101343650`) e permite registrar ou corrigir o Top 5 oficial da última corrida.
 
 ## Executar com Docker

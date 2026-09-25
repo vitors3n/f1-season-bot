@@ -69,6 +69,17 @@ class WebAppAuthTest(unittest.TestCase):
 
         self.assertEqual(webapp.carregar_resultado_top5(corrida), pilotos)
 
+    def test_calcula_pontos_por_posicao_e_top5(self):
+        corrida_previsao = CorridaFalsa(datetime.now(timezone.utc) + timedelta(hours=2))
+        corrida_resultado = {"date": corrida_previsao.dia, "raceName": corrida_previsao.nome}
+        previsao = ["a", "b", "c", "d", "e"]
+        resultado = ["a", "c", "b", "x", "e"]
+
+        webapp.salvar_top5(123, corrida_previsao, previsao)
+        webapp.salvar_resultado_top5(101343650, corrida_resultado, resultado)
+
+        self.assertEqual(webapp.pontuacao_usuario(123), 50)
+
 
 class CorridaFalsa:
     dia = "2026-12-01"

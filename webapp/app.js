@@ -13,6 +13,7 @@ const top5Fields = document.querySelector("#top5-fields");
 const top5Deadline = document.querySelector("#top5-deadline");
 const top5Feedback = document.querySelector("#top5-feedback");
 const top5Submit = document.querySelector("#top5-submit");
+const top5Points = document.querySelector("#top5-points");
 const adminSection = document.querySelector("#admin-section");
 const adminTitle = document.querySelector("#admin-title");
 const adminForm = document.querySelector("#admin-form");
@@ -65,6 +66,7 @@ function renderizarTop5(dados) {
   dados.previsao.forEach((piloto, indice) => adicionarCampoTop5(indice + 1, dados.pilotos, piloto));
   for (let posicao = dados.previsao.length + 1; posicao <= 5; posicao += 1) adicionarCampoTop5(posicao, dados.pilotos);
   top5Submit.disabled = !dados.aberto;
+  top5Points.textContent = `Pontuação total: ${dados.pontuacao_total} pontos`;
   top5Deadline.textContent = dados.aberto
     ? `Você pode alterar sua previsão até ${formatarData(dados.fechamento)}.`
     : "As previsões estão fechadas desde 30 minutos antes da corrida.";
