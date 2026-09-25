@@ -325,6 +325,41 @@ def pontuacao_usuario(telegram_id):
     return linha[0]
 
 
+def ranking_geral(telegram_id, limite=20):
+    conexao = sqlite3.connect(AUTH_DATABASE_PATH)
+    try:
+        linhas = conexao.execute(
+            """SELECT u.telegram_id, u.first_name, u.username, COALESCE(SUM(s.points), 0) AS pontos
+               FROM webapp_users u
+               LEFT JOIN top5_scores s ON s.telegram_id = u.telegram_id
+               GROUP BY u.telegram_id, u.first_name, u.username
+               ORDER BY pontos DESC, u.first_name COLLATE NOCASE, u.telegram_id"""
+        ).fetchall()
+    finally:
+        conexao.close()
+
+    ranking = []
+    posicao_anterior = 0
+    pontos_anteriores = None
+    posicao_usuario = None
+    for indice, (usuario_id, nome, username, pontos) in enumerate(linhas, 1):
+        if pontos != pontos_anteriores:
+            posicao_anterior = indice
+            pontos_anteriores = pontos
+        item = {
+            "posicao": posicao_anterior,
+            "nome": nome,
+            "username": username,
+            "pontos": pontos,
+            "e_usuario": usuario_id == telegram_id,
+        }
+        if item["e_usuario"]:
+            posicao_usuario = item
+        if len(ranking) < limite:
+            ranking.append(item)
+    return {"ranking": ranking, "usuario": posicao_usuario}
+
+
 def historico_top5(telegram_id, limite=10):
     conexao = sqlite3.connect(AUTH_DATABASE_PATH)
     try:
@@ -402,6 +437,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self._responder_top5()
         elif caminho == "/api/historico":
             self._responder_historico()
+        elif caminho == "/api/ranking":
+            self._responder_ranking()
         elif caminho == "/api/admin/top5":
             self._responder_admin_top5()
         elif caminho == "/api/proxima-corrida":
@@ -482,6 +519,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
         usuario = self._usuario_autenticado()
         if usuario:
             self._enviar_json({"historico": historico_top5(usuario["telegram_id"])})
+
+    def _responder_ranking(self):
+        usuario = self._usuario_autenticado()
+        if usuario:
+            self._enviar_json(ranking_geral(usuario["telegram_id"]))
 
     def _usuario_admin(self):
         usuario = self._usuario_autenticado()

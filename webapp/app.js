@@ -21,6 +21,24 @@ const adminFields = document.querySelector("#admin-fields");
 const adminFeedback = document.querySelector("#admin-feedback");
 const historySection = document.querySelector("#history-section");
 const historyContainer = document.querySelector("#history");
+const rankingUser = document.querySelector("#ranking-user");
+const ranking = document.querySelector("#ranking");
+const adminTab = document.querySelector("#admin-tab");
+const tabs = document.querySelectorAll("[data-tab]");
+const panels = document.querySelectorAll("[data-panel]");
+let abaAtiva = "dashboard";
+
+function mostrarAba(nome) {
+  abaAtiva = nome;
+  panels.forEach((painel) => { painel.hidden = painel.dataset.panel !== nome; });
+  tabs.forEach((aba) => {
+    const ativa = aba.dataset.tab === nome;
+    aba.classList.toggle("active", ativa);
+    aba.setAttribute("aria-selected", ativa);
+  });
+}
+
+tabs.forEach((aba) => aba.addEventListener("click", () => mostrarAba(aba.dataset.tab)));
 
 async function autenticarTelegram() {
   if (!telegram?.initData) {
@@ -56,6 +74,7 @@ async function carregarProximaCorrida() {
     status.hidden = true; content.hidden = false; scheduleSection.hidden = false;
     await carregarTop5();
     await carregarHistorico();
+    await carregarRanking();
     await carregarAdmin();
   } catch (erro) { status.textContent = erro.message || "Não foi possível carregar a próxima corrida."; }
 }
@@ -73,7 +92,7 @@ function renderizarTop5(dados) {
   top5Deadline.textContent = dados.aberto
     ? `Você pode alterar sua previsão até ${formatarData(dados.fechamento)}.`
     : "As previsões estão fechadas desde 30 minutos antes da corrida.";
-  top5Section.hidden = false;
+  mostrarAba(abaAtiva);
 }
 
 function adicionarCampoTop5(posicao, pilotos, selecionado = "") {
@@ -118,6 +137,32 @@ async function carregarHistorico() {
   historySection.hidden = false;
 }
 
+function nomeNoRanking(item) {
+  return item.username ? `${item.nome} (@${item.username})` : item.nome;
+}
+
+async function carregarRanking() {
+  const response = await fetch("api/ranking");
+  const dados = await response.json();
+  if (!response.ok) throw new Error(dados.erro);
+  ranking.replaceChildren();
+  dados.ranking.forEach((item) => {
+    const linha = document.createElement("li");
+    const posicao = document.createElement("span");
+    const nome = document.createElement("span");
+    const pontos = document.createElement("span");
+    posicao.className = "position"; nome.className = "name"; pontos.className = "points";
+    posicao.textContent = `${item.posicao}º`;
+    nome.textContent = nomeNoRanking(item);
+    pontos.textContent = `${item.pontos} pts`;
+    linha.classList.toggle("current-user", item.e_usuario);
+    linha.append(posicao, nome, pontos); ranking.append(linha);
+  });
+  if (dados.usuario && !dados.ranking.some((item) => item.e_usuario)) {
+    rankingUser.textContent = `Sua posição: ${dados.usuario.posicao}º, com ${dados.usuario.pontos} pontos.`;
+  }
+}
+
 function adicionarCampoAdmin(posicao, pilotos, selecionado = "") {
   const label = document.createElement("label");
   const ordem = document.createElement("span");
@@ -134,7 +179,8 @@ function renderizarAdmin(dados) {
   dados.resultado.forEach((piloto, indice) => adicionarCampoAdmin(indice + 1, dados.pilotos, piloto));
   for (let posicao = dados.resultado.length + 1; posicao <= 5; posicao += 1) adicionarCampoAdmin(posicao, dados.pilotos);
   adminTitle.textContent = `Resultado oficial — ${dados.corrida.nome}`;
-  adminSection.hidden = false;
+  adminTab.hidden = false;
+  mostrarAba(abaAtiva);
 }
 
 async function carregarAdmin() {
@@ -187,4 +233,5 @@ adminForm.addEventListener("submit", async (evento) => {
     adminFeedback.textContent = erro.message || "Não foi possível salvar o resultado.";
   }
 });
+mostrarAba("dashboard");
 carregarProximaCorrida();

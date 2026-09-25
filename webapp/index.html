@@ -11,16 +11,28 @@
   <body>
     <main class="dashboard">
       <header><p class="eyebrow">F1 SEASON</p><h1>Próximo GP</h1><p id="user" class="user" hidden></p></header>
-      <section class="race-card" aria-live="polite">
-        <div class="flag" aria-hidden="true">🏁</div>
-        <p id="status" class="status">Carregando corrida...</p>
-        <div id="race-content" hidden>
-          <p class="label">PRÓXIMA CORRIDA</p><h2 id="race-name"></h2><p id="circuit" class="circuit"></p>
-          <div class="race-time"><span>Corrida</span><strong id="race-date"></strong></div>
-        </div>
-      </section>
-      <section id="schedule-section" hidden><h2>Programação do fim de semana</h2><ul id="schedule" class="schedule"></ul></section>
-      <section id="top5-section" hidden>
+      <nav class="tabs" aria-label="Navegação do Mini App">
+        <button class="tab active" data-tab="dashboard" type="button">Dashboard</button>
+        <button class="tab" data-tab="previsao" type="button">Previsão</button>
+        <button class="tab" data-tab="ranking" type="button">Ranking</button>
+        <button id="admin-tab" class="tab" data-tab="admin" type="button" hidden>Admin</button>
+      </nav>
+      <div data-panel="dashboard">
+        <section class="race-card" aria-live="polite">
+          <div class="flag" aria-hidden="true">🏁</div>
+          <p id="status" class="status">Carregando corrida...</p>
+          <div id="race-content" hidden>
+            <p class="label">PRÓXIMA CORRIDA</p><h2 id="race-name"></h2><p id="circuit" class="circuit"></p>
+            <div class="race-time"><span>Corrida</span><strong id="race-date"></strong></div>
+          </div>
+        </section>
+        <section id="schedule-section" hidden><h2>Programação do fim de semana</h2><ul id="schedule" class="schedule"></ul></section>
+        <section id="history-section" hidden>
+          <h2>Histórico</h2>
+          <div id="history" class="history"></div>
+        </section>
+      </div>
+      <section id="top5-section" data-panel="previsao" hidden>
         <h2>Seu Top 5</h2>
         <p id="top5-points" class="hint"></p>
         <p id="top5-deadline" class="hint"></p>
@@ -30,11 +42,12 @@
         </form>
         <p id="top5-feedback" class="hint" aria-live="polite"></p>
       </section>
-      <section id="history-section" hidden>
-        <h2>Histórico</h2>
-        <div id="history" class="history"></div>
+      <section id="ranking-section" data-panel="ranking" hidden>
+        <h2>Ranking geral</h2>
+        <p id="ranking-user" class="hint"></p>
+        <ol id="ranking" class="ranking"></ol>
       </section>
-      <section id="admin-section" hidden>
+      <section id="admin-section" data-panel="admin" hidden>
         <p class="eyebrow">ADMINISTRAÇÃO</p>
         <h2 id="admin-title">Resultado oficial — Top 5</h2>
         <p class="hint">Defina a ordem de chegada da última corrida. Salvar novamente substitui o resultado anterior.</p>

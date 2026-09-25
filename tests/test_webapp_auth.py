@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import sqlite3
 import tempfile
 import time
 import unittest
@@ -82,6 +83,24 @@ class WebAppAuthTest(unittest.TestCase):
         historico = webapp.historico_top5(123)
         self.assertEqual(historico[0]["previsao"], previsao)
         self.assertEqual(historico[0]["pontos"], 50)
+
+    def test_ranking_destaca_posicao_do_usuario(self):
+        webapp.criar_sessao({"telegram_id": 1, "first_name": "Ana", "username": "ana"})
+        webapp.criar_sessao({"telegram_id": 2, "first_name": "Bia", "username": "bia"})
+        conexao = sqlite3.connect(webapp.AUTH_DATABASE_PATH)
+        try:
+            conexao.executemany(
+                "INSERT INTO top5_scores (race_key, telegram_id, points, updated_at) VALUES (?, ?, ?, ?)",
+                [("2026-01-01:GP A", 1, 50, 1), ("2026-01-01:GP A", 2, 20, 1)],
+            )
+            conexao.commit()
+        finally:
+            conexao.close()
+
+        ranking = webapp.ranking_geral(2)
+
+        self.assertEqual(ranking["ranking"][0]["nome"], "Ana")
+        self.assertEqual(ranking["usuario"]["posicao"], 2)
 
 
 class CorridaFalsa:
