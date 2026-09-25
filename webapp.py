@@ -170,7 +170,12 @@ def criar_sessao(usuario):
 def usuario_da_sessao(cabecalho_cookie):
     if not cabecalho_cookie:
         return None
-    cookies = dict(item.strip().split("=", 1) for item in cabecalho_cookie.split(";") if "=" in item)
+    cookies = {
+        chave: valor
+        for item in cabecalho_cookie.split(";")
+        if "=" in item
+        for chave, valor in [item.strip().split("=", 1)]
+    }
     token = cookies.get("f1_session")
     if not token:
         return None
