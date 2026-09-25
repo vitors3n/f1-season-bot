@@ -136,7 +136,7 @@ def validar_init_data(init_data):
         usuario = json.loads(dados["user"])
         telegram_id = int(usuario["id"])
         first_name = str(usuario["first_name"])
-    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as erro:
+    except (KeyError, TypeError, ValueError) as erro:
         raise ValueError("Usuário do Telegram inválido.") from erro
     return {"telegram_id": telegram_id, "first_name": first_name, "username": usuario.get("username")}
 
@@ -470,7 +470,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             corpo = json.loads(self.rfile.read(tamanho))
             usuario = validar_init_data(corpo["init_data"])
             token = criar_sessao(usuario)
-        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as erro:
+        except (KeyError, TypeError, ValueError) as erro:
             self._enviar_json({"erro": str(erro)}, HTTPStatus.UNAUTHORIZED)
             return
         self._enviar_json({"usuario": usuario}, headers={"Set-Cookie": self._cookie_sessao(token)})
@@ -566,7 +566,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self._enviar_json(resposta_top5(usuario, corrida, pilotos))
         except PermissionError as erro:
             self._enviar_json({"erro": str(erro)}, HTTPStatus.FORBIDDEN)
-        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as erro:
+        except (KeyError, TypeError, ValueError) as erro:
             self._enviar_json({"erro": str(erro)}, HTTPStatus.BAD_REQUEST)
         except Exception:
             LOGGER.exception("Falha ao salvar a previsão Top 5")
@@ -590,7 +590,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 raise ValueError("Um ou mais pilotos nao sao validos.")
             salvar_resultado_top5(usuario["telegram_id"], corrida, escolhidos)
             self._enviar_json(resposta_admin(corrida, pilotos))
-        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as erro:
+        except (KeyError, TypeError, ValueError) as erro:
             self._enviar_json({"erro": str(erro)}, HTTPStatus.BAD_REQUEST)
         except Exception:
             LOGGER.exception("Falha ao salvar o resultado Top 5")
