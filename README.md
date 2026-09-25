@@ -88,6 +88,8 @@ Após o Top 5 oficial ser registrado pela administração, cada piloto na posiç
 
 O dashboard também mantém um histórico das 10 previsões mais recentes do usuário e seus respectivos pontos.
 
+A aba Ranking mostra os 20 maiores totais de pontos e destaca a posição do usuário autenticado.
+
 A área administrativa aparece apenas para IDs configurados em `ADMIN_TELEGRAM_IDS` (por padrão, `101343650`) e permite registrar ou corrigir o Top 5 oficial da última corrida.
 
 ## Executar com Docker

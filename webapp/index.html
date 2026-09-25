@@ -14,6 +14,7 @@
       <nav class="tabs" aria-label="Navegação do Mini App">
         <button class="tab active" data-tab="dashboard" type="button">Dashboard</button>
         <button class="tab" data-tab="previsao" type="button">Previsão</button>
+        <button class="tab" data-tab="ranking" type="button">Ranking</button>
         <button id="admin-tab" class="tab" data-tab="admin" type="button" hidden>Admin</button>
       </nav>
       <div data-panel="dashboard">
@@ -40,6 +41,11 @@
           <button id="top5-submit" type="submit">Salvar previsão</button>
         </form>
         <p id="top5-feedback" class="hint" aria-live="polite"></p>
+      </section>
+      <section id="ranking-section" data-panel="ranking" hidden>
+        <h2>Ranking geral</h2>
+        <p id="ranking-user" class="hint"></p>
+        <ol id="ranking" class="ranking"></ol>
       </section>
       <section id="admin-section" data-panel="admin" hidden>
         <p class="eyebrow">ADMINISTRAÇÃO</p>

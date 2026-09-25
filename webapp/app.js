@@ -21,6 +21,8 @@ const adminFields = document.querySelector("#admin-fields");
 const adminFeedback = document.querySelector("#admin-feedback");
 const historySection = document.querySelector("#history-section");
 const historyContainer = document.querySelector("#history");
+const rankingUser = document.querySelector("#ranking-user");
+const ranking = document.querySelector("#ranking");
 const adminTab = document.querySelector("#admin-tab");
 const tabs = document.querySelectorAll("[data-tab]");
 const panels = document.querySelectorAll("[data-panel]");
@@ -72,6 +74,7 @@ async function carregarProximaCorrida() {
     status.hidden = true; content.hidden = false; scheduleSection.hidden = false;
     await carregarTop5();
     await carregarHistorico();
+    await carregarRanking();
     await carregarAdmin();
   } catch (erro) { status.textContent = erro.message || "Não foi possível carregar a próxima corrida."; }
 }
@@ -132,6 +135,32 @@ async function carregarHistorico() {
     card.append(titulo, previsao, pontos); historyContainer.append(card);
   });
   historySection.hidden = false;
+}
+
+function nomeNoRanking(item) {
+  return item.username ? `${item.nome} (@${item.username})` : item.nome;
+}
+
+async function carregarRanking() {
+  const response = await fetch("api/ranking");
+  const dados = await response.json();
+  if (!response.ok) throw new Error(dados.erro);
+  ranking.replaceChildren();
+  dados.ranking.forEach((item) => {
+    const linha = document.createElement("li");
+    const posicao = document.createElement("span");
+    const nome = document.createElement("span");
+    const pontos = document.createElement("span");
+    posicao.className = "position"; nome.className = "name"; pontos.className = "points";
+    posicao.textContent = `${item.posicao}º`;
+    nome.textContent = nomeNoRanking(item);
+    pontos.textContent = `${item.pontos} pts`;
+    linha.classList.toggle("current-user", item.e_usuario);
+    linha.append(posicao, nome, pontos); ranking.append(linha);
+  });
+  if (dados.usuario && !dados.ranking.some((item) => item.e_usuario)) {
+    rankingUser.textContent = `Sua posição: ${dados.usuario.posicao}º, com ${dados.usuario.pontos} pontos.`;
+  }
 }
 
 function adicionarCampoAdmin(posicao, pilotos, selecionado = "") {
