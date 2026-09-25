@@ -3,6 +3,7 @@
 body { margin: 0; background: var(--background); color: var(--text); font-family: Inter, Arial, sans-serif; }
 .dashboard { max-width: 620px; margin: auto; padding: 28px 20px 36px; }
 header { margin-bottom: 24px; }
+.tabs { display: flex; gap: 8px; margin: 0 0 24px; }.tab { background: var(--surface); color: var(--hint); padding: 10px 13px; width: auto; }.tab.active { background: var(--accent); color: white; }
 .user { color: var(--hint); margin: 8px 0 0; }
 .hint { color: var(--hint); line-height: 1.4; }
 .eyebrow, .label { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .12em; margin: 0 0 6px; }
