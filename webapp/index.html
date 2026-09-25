@@ -22,12 +22,27 @@
       <section id="schedule-section" hidden><h2>Programação do fim de semana</h2><ul id="schedule" class="schedule"></ul></section>
       <section id="top5-section" hidden>
         <h2>Seu Top 5</h2>
+        <p id="top5-points" class="hint"></p>
         <p id="top5-deadline" class="hint"></p>
         <form id="top5-form">
           <div id="top5-fields" class="top5-fields"></div>
           <button id="top5-submit" type="submit">Salvar previsão</button>
         </form>
         <p id="top5-feedback" class="hint" aria-live="polite"></p>
+      </section>
+      <section id="history-section" hidden>
+        <h2>Histórico</h2>
+        <div id="history" class="history"></div>
+      </section>
+      <section id="admin-section" hidden>
+        <p class="eyebrow">ADMINISTRAÇÃO</p>
+        <h2 id="admin-title">Resultado oficial — Top 5</h2>
+        <p class="hint">Defina a ordem de chegada da última corrida. Salvar novamente substitui o resultado anterior.</p>
+        <form id="admin-form">
+          <div id="admin-fields" class="top5-fields"></div>
+          <button type="submit">Salvar resultado oficial</button>
+        </form>
+        <p id="admin-feedback" class="hint" aria-live="polite"></p>
       </section>
     </main>
     <script src="app.js"></script>

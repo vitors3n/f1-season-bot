@@ -24,6 +24,7 @@ services:
     restart: unless-stopped
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
+      ADMIN_TELEGRAM_IDS: ${ADMIN_TELEGRAM_IDS:-101343650}
       WEB_APP_HOST: 0.0.0.0
       WEB_APP_COOKIE_SECURE: 1
       TZ: America/Sao_Paulo

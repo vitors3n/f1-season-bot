@@ -84,6 +84,12 @@ O dashboard exige autenticação pelo Telegram: abra-o pelo botão no chat priva
 
 Usuários autenticados podem registrar uma previsão ordenada dos cinco primeiros colocados da próxima corrida. A previsão pode ser alterada até 30 minutos antes da largada; esse bloqueio também é validado pelo servidor.
 
+Após o Top 5 oficial ser registrado pela administração, cada piloto na posição exata vale 20 pontos; um piloto presente no Top 5, mas em posição diferente, vale 5 pontos.
+
+O dashboard também mantém um histórico das 10 previsões mais recentes do usuário e seus respectivos pontos.
+
+A área administrativa aparece apenas para IDs configurados em `ADMIN_TELEGRAM_IDS` (por padrão, `101343650`) e permite registrar ou corrigir o Top 5 oficial da última corrida.
+
 ## Executar com Docker
 
 O Compose usa volumes para preservar o banco de lembretes e o cache entre atualizações. Antes de iniciar, ajuste os caminhos do host em `docker/docker-compose.yml` caso o servidor não use `/projetos/f1bot`.

@@ -60,6 +60,29 @@ class WebAppAuthTest(unittest.TestCase):
         with self.assertRaises(PermissionError):
             webapp.salvar_top5(123, corrida, ["a", "b", "c", "d", "e"])
 
+    def test_admin_padrao_pode_salvar_resultado_top5(self):
+        corrida = {"date": "2026-12-01", "raceName": "GP de Teste"}
+        pilotos = ["a", "b", "c", "d", "e"]
+
+        self.assertTrue(webapp.usuario_e_admin({"telegram_id": 101343650}))
+        webapp.salvar_resultado_top5(101343650, corrida, pilotos)
+
+        self.assertEqual(webapp.carregar_resultado_top5(corrida), pilotos)
+
+    def test_calcula_pontos_por_posicao_e_top5(self):
+        corrida_previsao = CorridaFalsa(datetime.now(timezone.utc) + timedelta(hours=2))
+        corrida_resultado = {"date": corrida_previsao.dia, "raceName": corrida_previsao.nome}
+        previsao = ["a", "b", "c", "d", "e"]
+        resultado = ["a", "c", "b", "x", "e"]
+
+        webapp.salvar_top5(123, corrida_previsao, previsao)
+        webapp.salvar_resultado_top5(101343650, corrida_resultado, resultado)
+
+        self.assertEqual(webapp.pontuacao_usuario(123), 50)
+        historico = webapp.historico_top5(123)
+        self.assertEqual(historico[0]["previsao"], previsao)
+        self.assertEqual(historico[0]["pontos"], 50)
+
 
 class CorridaFalsa:
     dia = "2026-12-01"
