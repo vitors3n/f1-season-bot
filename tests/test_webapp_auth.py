@@ -79,6 +79,9 @@ class WebAppAuthTest(unittest.TestCase):
         webapp.salvar_resultado_top5(101343650, corrida_resultado, resultado)
 
         self.assertEqual(webapp.pontuacao_usuario(123), 50)
+        historico = webapp.historico_top5(123)
+        self.assertEqual(historico[0]["previsao"], previsao)
+        self.assertEqual(historico[0]["pontos"], 50)
 
 
 class CorridaFalsa:

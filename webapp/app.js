@@ -19,6 +19,8 @@ const adminTitle = document.querySelector("#admin-title");
 const adminForm = document.querySelector("#admin-form");
 const adminFields = document.querySelector("#admin-fields");
 const adminFeedback = document.querySelector("#admin-feedback");
+const historySection = document.querySelector("#history-section");
+const historyContainer = document.querySelector("#history");
 
 async function autenticarTelegram() {
   if (!telegram?.initData) {
@@ -53,6 +55,7 @@ async function carregarProximaCorrida() {
     });
     status.hidden = true; content.hidden = false; scheduleSection.hidden = false;
     await carregarTop5();
+    await carregarHistorico();
     await carregarAdmin();
   } catch (erro) { status.textContent = erro.message || "Não foi possível carregar a próxima corrida."; }
 }
@@ -90,6 +93,29 @@ async function carregarTop5() {
   const dados = await response.json();
   if (!response.ok) throw new Error(dados.erro);
   renderizarTop5(dados);
+}
+
+function nomePiloto(driverId) {
+  return driverId.replaceAll("_", " ").replace(/\b\w/g, (letra) => letra.toUpperCase());
+}
+
+async function carregarHistorico() {
+  const response = await fetch("api/historico");
+  const dados = await response.json();
+  if (!response.ok) throw new Error(dados.erro);
+  if (!dados.historico.length) return;
+  historyContainer.replaceChildren();
+  dados.historico.forEach((item) => {
+    const card = document.createElement("article");
+    const titulo = document.createElement("h3");
+    const previsao = document.createElement("p");
+    const pontos = document.createElement("p");
+    titulo.textContent = `${item.corrida} — ${item.data.split("-").reverse().join("/")}`;
+    previsao.textContent = `Top 5: ${item.previsao.map(nomePiloto).join(", ")}`;
+    pontos.textContent = item.pontos === null ? "Aguardando resultado oficial" : `${item.pontos} pontos`;
+    card.append(titulo, previsao, pontos); historyContainer.append(card);
+  });
+  historySection.hidden = false;
 }
 
 function adicionarCampoAdmin(posicao, pilotos, selecionado = "") {
@@ -135,6 +161,7 @@ top5Form.addEventListener("submit", async (evento) => {
     if (!response.ok) throw new Error(dados.erro);
     renderizarTop5(dados);
     top5Feedback.textContent = "Previsão salva com sucesso.";
+    await carregarHistorico();
   } catch (erro) {
     top5Feedback.textContent = erro.message || "Não foi possível salvar a previsão.";
     top5Submit.disabled = false;

@@ -86,6 +86,8 @@ Usuários autenticados podem registrar uma previsão ordenada dos cinco primeiro
 
 Após o Top 5 oficial ser registrado pela administração, cada piloto na posição exata vale 20 pontos; um piloto presente no Top 5, mas em posição diferente, vale 5 pontos.
 
+O dashboard também mantém um histórico das 10 previsões mais recentes do usuário e seus respectivos pontos.
+
 A área administrativa aparece apenas para IDs configurados em `ADMIN_TELEGRAM_IDS` (por padrão, `101343650`) e permite registrar ou corrigir o Top 5 oficial da última corrida.
 
 ## Executar com Docker

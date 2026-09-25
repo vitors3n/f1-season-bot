@@ -325,6 +325,33 @@ def pontuacao_usuario(telegram_id):
     return linha[0]
 
 
+def historico_top5(telegram_id, limite=10):
+    conexao = sqlite3.connect(AUTH_DATABASE_PATH)
+    try:
+        linhas = conexao.execute(
+            """SELECT p.race_key, p.position, p.driver_id, s.points
+               FROM top5_predictions p
+               LEFT JOIN top5_scores s ON s.race_key = p.race_key AND s.telegram_id = p.telegram_id
+               WHERE p.telegram_id = ?
+               ORDER BY p.race_key DESC, p.position""",
+            (telegram_id,),
+        ).fetchall()
+    finally:
+        conexao.close()
+
+    corridas = []
+    por_chave = {}
+    for race_key, _, driver_id, pontos in linhas:
+        if race_key not in por_chave:
+            if len(corridas) == limite:
+                break
+            data, nome = race_key.split(":", 1)
+            por_chave[race_key] = {"data": data, "corrida": nome, "previsao": [], "pontos": pontos}
+            corridas.append(por_chave[race_key])
+        por_chave[race_key]["previsao"].append(driver_id)
+    return corridas
+
+
 def salvar_resultado_top5(admin_id, corrida, pilotos):
     if len(pilotos) != 5 or len(set(pilotos)) != 5:
         raise ValueError("Escolha cinco pilotos diferentes.")
@@ -373,6 +400,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self._responder_usuario()
         elif caminho == "/api/top5":
             self._responder_top5()
+        elif caminho == "/api/historico":
+            self._responder_historico()
         elif caminho == "/api/admin/top5":
             self._responder_admin_top5()
         elif caminho == "/api/proxima-corrida":
@@ -448,6 +477,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
         except Exception:
             LOGGER.exception("Falha ao carregar a previsão Top 5")
             self._enviar_json({"erro": "Não foi possível carregar o Top 5 agora."}, HTTPStatus.BAD_GATEWAY)
+
+    def _responder_historico(self):
+        usuario = self._usuario_autenticado()
+        if usuario:
+            self._enviar_json({"historico": historico_top5(usuario["telegram_id"])})
 
     def _usuario_admin(self):
         usuario = self._usuario_autenticado()
