@@ -23,11 +23,14 @@ services:
     container_name: f1web
     restart: unless-stopped
     environment:
+      BOT_TOKEN: ${BOT_TOKEN}
       WEB_APP_HOST: 0.0.0.0
+      WEB_APP_COOKIE_SECURE: 1
       TZ: America/Sao_Paulo
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
+      - /projetos/f1bot/data:/usr/src/f1-bot/data
       - /projetos/f1bot/jolpi_cache:/usr/src/f1-bot/jolpi_cache
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"

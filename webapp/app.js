@@ -6,9 +6,32 @@ const status = document.querySelector("#status");
 const content = document.querySelector("#race-content");
 const scheduleSection = document.querySelector("#schedule-section");
 const schedule = document.querySelector("#schedule");
+const user = document.querySelector("#user");
+const top5Section = document.querySelector("#top5-section");
+const top5Form = document.querySelector("#top5-form");
+const top5Fields = document.querySelector("#top5-fields");
+const top5Deadline = document.querySelector("#top5-deadline");
+const top5Feedback = document.querySelector("#top5-feedback");
+const top5Submit = document.querySelector("#top5-submit");
+
+async function autenticarTelegram() {
+  if (!telegram?.initData) {
+    throw new Error("Abra o dashboard pelo botão no chat privado com o bot.");
+  }
+  const response = await fetch("api/auth/telegram", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ init_data: telegram.initData }),
+  });
+  const dados = await response.json();
+  if (!response.ok) throw new Error(dados.erro);
+  user.textContent = `Olá, ${dados.usuario.first_name}`;
+  user.hidden = false;
+}
 
 async function carregarProximaCorrida() {
   try {
+    await autenticarTelegram();
     const response = await fetch("api/proxima-corrida");
     const dados = await response.json();
     if (!response.ok) throw new Error(dados.erro);
@@ -23,6 +46,63 @@ async function carregarProximaCorrida() {
       item.append(nome, data); schedule.append(item);
     });
     status.hidden = true; content.hidden = false; scheduleSection.hidden = false;
+    await carregarTop5();
   } catch (erro) { status.textContent = erro.message || "Não foi possível carregar a próxima corrida."; }
 }
+
+function formatarData(data) {
+  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(data));
+}
+
+function renderizarTop5(dados) {
+  top5Fields.replaceChildren();
+  dados.previsao.forEach((piloto, indice) => adicionarCampoTop5(indice + 1, dados.pilotos, piloto));
+  for (let posicao = dados.previsao.length + 1; posicao <= 5; posicao += 1) adicionarCampoTop5(posicao, dados.pilotos);
+  top5Submit.disabled = !dados.aberto;
+  top5Deadline.textContent = dados.aberto
+    ? `Você pode alterar sua previsão até ${formatarData(dados.fechamento)}.`
+    : "As previsões estão fechadas desde 30 minutos antes da corrida.";
+  top5Section.hidden = false;
+}
+
+function adicionarCampoTop5(posicao, pilotos, selecionado = "") {
+  const label = document.createElement("label");
+  const ordem = document.createElement("span");
+  const select = document.createElement("select");
+  ordem.textContent = `${posicao}º`;
+  select.name = `top-${posicao}`;
+  select.required = true;
+  select.append(new Option("Escolha um piloto", ""));
+  pilotos.forEach((piloto) => select.append(new Option(`${piloto.nome}${piloto.codigo ? ` (${piloto.codigo})` : ""}`, piloto.id, false, piloto.id === selecionado)));
+  label.append(ordem, select); top5Fields.append(label);
+}
+
+async function carregarTop5() {
+  const response = await fetch("api/top5");
+  const dados = await response.json();
+  if (!response.ok) throw new Error(dados.erro);
+  renderizarTop5(dados);
+}
+
+top5Form.addEventListener("submit", async (evento) => {
+  evento.preventDefault();
+  const pilotos = [...top5Form.querySelectorAll("select")].map((campo) => campo.value);
+  if (new Set(pilotos).size !== 5 || pilotos.includes("")) {
+    top5Feedback.textContent = "Escolha cinco pilotos diferentes.";
+    return;
+  }
+  top5Submit.disabled = true;
+  try {
+    const response = await fetch("api/top5", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pilotos }),
+    });
+    const dados = await response.json();
+    if (!response.ok) throw new Error(dados.erro);
+    renderizarTop5(dados);
+    top5Feedback.textContent = "Previsão salva com sucesso.";
+  } catch (erro) {
+    top5Feedback.textContent = erro.message || "Não foi possível salvar a previsão.";
+    top5Submit.disabled = false;
+  }
+});
 carregarProximaCorrida();
