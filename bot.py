@@ -17,6 +17,7 @@ from comandos.drivers import drivers
 from comandos.teams import teams
 from comandos.settings import settings, settings_callback
 from comandos.dashboard import dashboard, teclado_dashboard
+from comandos.ranking import ranking
 from comandos.mensagens import MENSAGEM_INICIAL
 from config import BOT_TOKEN, LOG_LEVEL, WEB_APP_URL
 from servicos.http_client import encerrar_http_client, iniciar_http_client
@@ -65,6 +66,7 @@ def main():
     )
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("dashboard", dashboard))
+    application.add_handler(CommandHandler("ranking", ranking))
     application.add_handler(CommandHandler("next", next))
     application.add_handler(CommandHandler("calendar", calendar))
     application.add_handler(CallbackQueryHandler(calendar_callback, pattern="^calendar:"))

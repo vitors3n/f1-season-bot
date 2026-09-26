@@ -92,6 +92,8 @@ A aba Ranking mostra os 20 maiores totais de pontos e destaca a posição do usu
 
 A área administrativa aparece apenas para IDs configurados em `ADMIN_TELEGRAM_IDS` (por padrão, `101343650`) e permite registrar ou corrigir o Top 5 oficial da última corrida.
 
+O resultado oficial fica disponível para administração a partir de 30 minutos após a largada programada e pode ser alterado por até três dias após esse horário.
+
 ## Executar com Docker
 
 O Compose usa volumes para preservar o banco de lembretes e o cache entre atualizações. Antes de iniciar, ajuste os caminhos do host em `docker/docker-compose.yml` caso o servidor não use `/projetos/f1bot`.
@@ -120,6 +122,7 @@ docker compose -f docker/docker-compose.yml stop f1bot
 | --- | --- |
 | `/next` | Próxima corrida e programação do fim de semana. |
 | `/dashboard` | Abre o dashboard visual do próximo GP. |
+| `/ranking` | Exibe o ranking geral de pontos. |
 | `/countdown` | Tempo restante para a próxima sessão. |
 | `/calendar` | Calendário da temporada atual. |
 | `/qualifying` | Resultado da última classificação. |
@@ -144,6 +147,7 @@ As opções são carregadas de `.env`; valores não definidos usam os padrões d
 | `TIMEZONE_LABEL` | `Fortaleza (CE)` | Nome apresentado nas mensagens. |
 | `DATABASE_URL` | `sqlite:///data/lembretes.sqlite` | Banco dos lembretes do APScheduler. |
 | `SETTINGS_DATABASE_PATH` | `data/configuracoes.sqlite` | Banco das preferências por chat. |
+| `WEB_APP_DATABASE_PATH` | `data/webapp.sqlite` | Banco de usuários, previsões e pontuação do Mini App. |
 | `CACHE_DIRECTORY` | `jolpi_cache` | Diretório do cache das APIs. |
 | `REQUEST_TIMEOUT` | `15` | Tempo máximo de espera por uma API, em segundos. |
 | `REMINDER_MINUTES` | `10,5` | Minutos de antecedência dos lembretes. |

@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 import webapp
+from servicos import ranking as ranking_servico
 
 
 class WebAppAuthTest(unittest.TestCase):
@@ -18,6 +19,7 @@ class WebAppAuthTest(unittest.TestCase):
         webapp.AUTH_DATABASE_PATH = str(Path(self.diretorio_temporario.name) / "webapp.sqlite")
         webapp.BOT_TOKEN = "token-de-teste"
         webapp.INIT_DATA_MAX_AGE_SECONDS = 86400
+        ranking_servico.WEB_APP_DATABASE_PATH = webapp.AUTH_DATABASE_PATH
         webapp.inicializar_banco()
 
     def tearDown(self):
@@ -62,27 +64,43 @@ class WebAppAuthTest(unittest.TestCase):
             webapp.salvar_top5(123, corrida, ["a", "b", "c", "d", "e"])
 
     def test_admin_padrao_pode_salvar_resultado_top5(self):
-        corrida = {"date": "2026-12-01", "raceName": "GP de Teste"}
+        corrida = {"date": "2026-12-01", "time": "15:00:00Z", "raceName": "GP de Teste"}
         pilotos = ["a", "b", "c", "d", "e"]
 
         self.assertTrue(webapp.usuario_e_admin({"telegram_id": 101343650}))
-        webapp.salvar_resultado_top5(101343650, corrida, pilotos)
+        webapp.salvar_resultado_top5(101343650, corrida, pilotos, datetime(2026, 12, 1, 16, tzinfo=timezone.utc))
 
         self.assertEqual(webapp.carregar_resultado_top5(corrida), pilotos)
 
     def test_calcula_pontos_por_posicao_e_top5(self):
         corrida_previsao = CorridaFalsa(datetime.now(timezone.utc) + timedelta(hours=2))
-        corrida_resultado = {"date": corrida_previsao.dia, "raceName": corrida_previsao.nome}
+        corrida_resultado = {"date": corrida_previsao.dia, "time": "15:00:00Z", "raceName": corrida_previsao.nome}
         previsao = ["a", "b", "c", "d", "e"]
         resultado = ["a", "c", "b", "x", "e"]
 
         webapp.salvar_top5(123, corrida_previsao, previsao)
-        webapp.salvar_resultado_top5(101343650, corrida_resultado, resultado)
+        webapp.salvar_resultado_top5(101343650, corrida_resultado, resultado, datetime(2026, 12, 1, 16, tzinfo=timezone.utc))
 
         self.assertEqual(webapp.pontuacao_usuario(123), 50)
         historico = webapp.historico_top5(123)
         self.assertEqual(historico[0]["previsao"], previsao)
         self.assertEqual(historico[0]["pontos"], 50)
+
+    def test_janela_administrativa_abre_e_fecha_no_prazo(self):
+        corrida = {"date": "2026-12-01", "time": "15:00:00Z", "raceName": "GP de Teste"}
+
+        self.assertFalse(webapp.janela_resultado_aberta(corrida, datetime(2026, 12, 1, 15, 29, tzinfo=timezone.utc)))
+        self.assertTrue(webapp.janela_resultado_aberta(corrida, datetime(2026, 12, 1, 15, 30, tzinfo=timezone.utc)))
+        self.assertTrue(webapp.janela_resultado_aberta(corrida, datetime(2026, 12, 4, 15, tzinfo=timezone.utc)))
+        self.assertFalse(webapp.janela_resultado_aberta(corrida, datetime(2026, 12, 4, 15, 1, tzinfo=timezone.utc)))
+
+        with self.assertRaises(PermissionError):
+            webapp.salvar_resultado_top5(
+                101343650,
+                corrida,
+                ["a", "b", "c", "d", "e"],
+                datetime(2026, 12, 1, 15, 29, tzinfo=timezone.utc),
+            )
 
     def test_ranking_destaca_posicao_do_usuario(self):
         webapp.criar_sessao({"telegram_id": 1, "first_name": "Ana", "username": "ana"})
@@ -101,6 +119,7 @@ class WebAppAuthTest(unittest.TestCase):
 
         self.assertEqual(ranking["ranking"][0]["nome"], "Ana")
         self.assertEqual(ranking["usuario"]["posicao"], 2)
+        self.assertEqual(ranking_servico.lista_ranking(1)[0]["nome"], "Ana")
 
 
 class CorridaFalsa:
