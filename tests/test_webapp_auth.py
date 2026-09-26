@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 import webapp
+from servicos import ranking as ranking_servico
 
 
 class WebAppAuthTest(unittest.TestCase):
@@ -18,6 +19,7 @@ class WebAppAuthTest(unittest.TestCase):
         webapp.AUTH_DATABASE_PATH = str(Path(self.diretorio_temporario.name) / "webapp.sqlite")
         webapp.BOT_TOKEN = "token-de-teste"
         webapp.INIT_DATA_MAX_AGE_SECONDS = 86400
+        ranking_servico.WEB_APP_DATABASE_PATH = webapp.AUTH_DATABASE_PATH
         webapp.inicializar_banco()
 
     def tearDown(self):
@@ -117,6 +119,7 @@ class WebAppAuthTest(unittest.TestCase):
 
         self.assertEqual(ranking["ranking"][0]["nome"], "Ana")
         self.assertEqual(ranking["usuario"]["posicao"], 2)
+        self.assertEqual(ranking_servico.lista_ranking(1)[0]["nome"], "Ana")
 
 
 class CorridaFalsa:

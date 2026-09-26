@@ -15,7 +15,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qsl, urlparse
 
-from config import BOT_TOKEN
+from config import BOT_TOKEN, WEB_APP_DATABASE_PATH
 from servicos.http_client import encerrar_http_client
 from servicos.calendario import pega_calendario
 from servicos.pega_corrida import pega_corrida
@@ -26,7 +26,7 @@ LOGGER = logging.getLogger(__name__)
 STATIC_DIRECTORY = Path(__file__).parent / "webapp"
 HOST = os.getenv("WEB_APP_HOST", "127.0.0.1")
 PORT = int(os.getenv("WEB_APP_PORT", "8000"))
-AUTH_DATABASE_PATH = os.getenv("WEB_APP_DATABASE_PATH", "data/webapp.sqlite")
+AUTH_DATABASE_PATH = WEB_APP_DATABASE_PATH
 SESSION_TTL_SECONDS = int(os.getenv("WEB_APP_SESSION_TTL", str(7 * 24 * 60 * 60)))
 INIT_DATA_MAX_AGE_SECONDS = int(os.getenv("WEB_APP_INIT_DATA_MAX_AGE", "86400"))
 COOKIE_SECURE = os.getenv("WEB_APP_COOKIE_SECURE", "1") == "1"

@@ -14,6 +14,7 @@ CACHE_DIRECTORY = os.getenv("CACHE_DIRECTORY", "jolpi_cache")
 REQUEST_TIMEOUT = int(os.getenv("REQUEST_TIMEOUT", "15"))
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 WEB_APP_URL = os.getenv("WEB_APP_URL")
+WEB_APP_DATABASE_PATH = os.getenv("WEB_APP_DATABASE_PATH", "data/webapp.sqlite")
 
 CACHE_TTL_NEXT_RACE = int(os.getenv("CACHE_TTL_NEXT_RACE", str(12 * 60 * 60)))
 CACHE_TTL_CALENDAR = int(os.getenv("CACHE_TTL_CALENDAR", str(12 * 60 * 60)))
