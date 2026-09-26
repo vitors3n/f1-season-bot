@@ -94,6 +94,8 @@ A área administrativa aparece apenas para IDs configurados em `ADMIN_TELEGRAM_I
 
 O resultado oficial fica disponível para administração a partir de 30 minutos após a largada programada e pode ser alterado por até três dias após esse horário.
 
+Essa janela considera somente a largada da corrida principal; treinos livres, qualificação e corrida sprint não alteram o prazo.
+
 ## Executar com Docker
 
 O Compose usa volumes para preservar o banco de lembretes e o cache entre atualizações. Antes de iniciar, ajuste os caminhos do host em `docker/docker-compose.yml` caso o servidor não use `/projetos/f1bot`.
