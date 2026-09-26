@@ -92,6 +92,8 @@ A aba Ranking mostra os 20 maiores totais de pontos e destaca a posição do usu
 
 A área administrativa aparece apenas para IDs configurados em `ADMIN_TELEGRAM_IDS` (por padrão, `101343650`) e permite registrar ou corrigir o Top 5 oficial da última corrida.
 
+O resultado oficial fica disponível para administração a partir de 30 minutos após a largada programada e pode ser alterado por até três dias após esse horário.
+
 ## Executar com Docker
 
 O Compose usa volumes para preservar o banco de lembretes e o cache entre atualizações. Antes de iniciar, ajuste os caminhos do host em `docker/docker-compose.yml` caso o servidor não use `/projetos/f1bot`.

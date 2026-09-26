@@ -188,6 +188,7 @@ async function carregarAdmin() {
   if (response.status === 403) return;
   const dados = await response.json();
   if (!response.ok) throw new Error(dados.erro);
+  if (dados.disponivel === false) return;
   renderizarAdmin(dados);
 }
 

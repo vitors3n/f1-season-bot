@@ -9,14 +9,15 @@ import os
 import secrets
 import sqlite3
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qsl, urlparse
 
 from config import BOT_TOKEN
-from servicos.http_client import busca_json, encerrar_http_client
+from servicos.http_client import encerrar_http_client
+from servicos.calendario import pega_calendario
 from servicos.pega_corrida import pega_corrida
 from servicos.campeonato_pilotos import campeonato_pilotos
 
@@ -205,12 +206,35 @@ async def obter_dados_top5():
 
 async def obter_dados_admin():
     try:
-        dados = await busca_json("https://api.jolpi.ca/ergast/f1/current/last/results.json")
-        corridas = dados.get("MRData", {}).get("RaceTable", {}).get("Races", []) if dados else []
+        corridas = await pega_calendario()
         pilotos = await campeonato_pilotos()
-        return (corridas[0] if corridas else None), pilotos
+        return ultima_corrida_administravel(corridas or []), pilotos
     finally:
         await encerrar_http_client()
+
+
+def horario_corrida(corrida):
+    if not corrida.get("time"):
+        return None
+    return datetime.strptime(
+        f'{corrida["date"]} {corrida["time"]}', "%Y-%m-%d %H:%M:%SZ"
+    ).replace(tzinfo=timezone.utc)
+
+
+def janela_resultado_aberta(corrida, agora=None):
+    inicio = horario_corrida(corrida)
+    if inicio is None:
+        return False
+    agora = agora or datetime.now(timezone.utc)
+    return inicio + timedelta(minutes=30) <= agora <= inicio + timedelta(days=3)
+
+
+def ultima_corrida_administravel(corridas, agora=None):
+    elegiveis = [
+        corrida for corrida in corridas
+        if janela_resultado_aberta(corrida, agora)
+    ]
+    return max(elegiveis, key=horario_corrida, default=None)
 
 
 def chave_corrida(corrida):
@@ -392,9 +416,11 @@ def historico_top5(telegram_id, limite=10):
     return corridas
 
 
-def salvar_resultado_top5(admin_id, corrida, pilotos):
+def salvar_resultado_top5(admin_id, corrida, pilotos, agora=None):
     if len(pilotos) != 5 or len(set(pilotos)) != 5:
         raise ValueError("Escolha cinco pilotos diferentes.")
+    if not janela_resultado_aberta(corrida, agora):
+        raise PermissionError("O resultado só pode ser definido entre 30 minutos e 3 dias após a largada.")
     agora = int(time.time())
     conexao = sqlite3.connect(AUTH_DATABASE_PATH)
     try:
@@ -542,8 +568,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return
         try:
             corrida, pilotos = asyncio.run(obter_dados_admin())
-            if corrida is None or pilotos is None:
-                raise ValueError("Nao foi possivel carregar a ultima corrida.")
+            if corrida is None:
+                self._enviar_json({"disponivel": False})
+                return
+            if pilotos is None:
+                raise ValueError("Nao foi possivel carregar os pilotos.")
             self._enviar_json(resposta_admin(corrida, pilotos))
         except ValueError as erro:
             self._enviar_json({"erro": str(erro)}, HTTPStatus.BAD_GATEWAY)
@@ -589,12 +618,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 raise ValueError("Resultado invalido.")
             corrida, pilotos = asyncio.run(obter_dados_admin())
             if corrida is None or pilotos is None:
-                raise ValueError("Nao foi possivel carregar a ultima corrida.")
+                raise ValueError("Nao ha corrida disponivel para definir o resultado.")
             pilotos_disponiveis = {piloto["id"] for piloto in serializar_pilotos(pilotos)}
             if not set(escolhidos).issubset(pilotos_disponiveis):
                 raise ValueError("Um ou mais pilotos nao sao validos.")
             salvar_resultado_top5(usuario["telegram_id"], corrida, escolhidos)
             self._enviar_json(resposta_admin(corrida, pilotos))
+        except PermissionError as erro:
+            self._enviar_json({"erro": str(erro)}, HTTPStatus.FORBIDDEN)
         except (KeyError, TypeError, ValueError) as erro:
             self._enviar_json({"erro": str(erro)}, HTTPStatus.BAD_REQUEST)
         except Exception:
