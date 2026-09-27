@@ -1,4 +1,4 @@
-from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler, filters
 from comandos.notify import (
     clear_notify,
     encerrar_scheduler,
@@ -16,7 +16,7 @@ from comandos.weather import weather
 from comandos.drivers import drivers
 from comandos.teams import teams
 from comandos.settings import settings, settings_callback
-from comandos.dashboard import dashboard, teclado_dashboard
+from comandos.dashboard import BOTAO_COUNTDOWN, BOTAO_PROXIMO_GP, dashboard, teclado_dashboard
 from comandos.ranking import ranking
 from comandos.mensagens import MENSAGEM_INICIAL
 from config import BOT_TOKEN, LOG_LEVEL, WEB_APP_URL
@@ -68,9 +68,11 @@ def main():
     application.add_handler(CommandHandler("dashboard", dashboard))
     application.add_handler(CommandHandler("ranking", ranking))
     application.add_handler(CommandHandler("next", next))
+    application.add_handler(MessageHandler(filters.Regex(f"^{BOTAO_PROXIMO_GP}$"), next))
     application.add_handler(CommandHandler("calendar", calendar))
     application.add_handler(CallbackQueryHandler(calendar_callback, pattern="^calendar:"))
     application.add_handler(CommandHandler("countdown", countdown))
+    application.add_handler(MessageHandler(filters.Regex(f"^{BOTAO_COUNTDOWN}$"), countdown))
     application.add_handler(CommandHandler("about", about))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("qualifying", qualifying))
