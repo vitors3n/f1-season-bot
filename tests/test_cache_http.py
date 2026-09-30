@@ -94,3 +94,24 @@ class CacheTest(unittest.IsolatedAsyncioTestCase):
 
         self.assertIsNone(resultado)
         self.assertIsNone(valor_cache)
+
+    async def test_falha_da_api_reutiliza_cache_expirado(self):
+        url = "https://api.jolpi.ca/ergast/f1/current.json"
+        dados = resposta_calendario()
+        with tempfile.TemporaryDirectory() as diretorio:
+            cache = Cache(diretorio)
+            try:
+                with (
+                    patch.object(calendario, "cache", cache),
+                    patch.object(calendario, "busca_json", new=AsyncMock(side_effect=(dados, None))) as busca_json,
+                ):
+                    await calendario.pega_calendario()
+                    cache.delete(url)
+                    with self.assertLogs(calendario.logger, "WARNING") as logs:
+                        resultado = await calendario.pega_calendario()
+            finally:
+                cache.close()
+
+        self.assertEqual(resultado, dados["MRData"]["RaceTable"]["Races"])
+        self.assertEqual(busca_json.await_count, 2)
+        self.assertIn("reutilizando Calendário expirado", logs.output[0])
