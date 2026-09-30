@@ -4,6 +4,7 @@ from datetime import datetime
 from diskcache import Cache
 import pytz
 from config import CACHE_DIRECTORY, CACHE_TTL_WEATHER
+from servicos.cache_fallback import buscar_com_cache
 from servicos.http_client import busca_json
 
 
@@ -13,12 +14,6 @@ logger = logging.getLogger(__name__)
 
 async def pega_previsao(latitude, longitude):
     cache_key = f"weather:{latitude}:{longitude}"
-    data = cache.get(cache_key)
-
-    if data is not None:
-        logger.debug("Previsão meteorológica obtida do cache")
-        return data
-
     parametros = {
         "latitude": latitude,
         "longitude": longitude,
@@ -30,15 +25,14 @@ async def pega_previsao(latitude, longitude):
         "timezone": "UTC",
     }
 
-    data = await busca_json(
-        "https://api.open-meteo.com/v1/forecast",
-        params=parametros,
+    return await buscar_com_cache(
+        cache,
+        cache_key,
+        CACHE_TTL_WEATHER,
+        lambda: busca_json("https://api.open-meteo.com/v1/forecast", params=parametros),
+        logger,
+        "Previsão meteorológica",
     )
-    if data is None:
-        return None
-    cache.set(cache_key, data, expire=CACHE_TTL_WEATHER)
-    logger.info("Previsão meteorológica atualizada pela API")
-    return data
 
 
 def previsao_no_horario(previsao, dia_hora):

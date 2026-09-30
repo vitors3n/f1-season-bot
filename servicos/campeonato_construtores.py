@@ -3,6 +3,7 @@ import logging
 from diskcache import Cache
 from datetime import datetime
 from config import CACHE_DIRECTORY, CACHE_TTL_STANDINGS
+from servicos.cache_fallback import buscar_com_cache
 from servicos.http_client import busca_json
 
 cache = Cache(CACHE_DIRECTORY)
@@ -11,18 +12,9 @@ logger = logging.getLogger(__name__)
 async def campeonato_construtores():
     ano_atual = datetime.now().year
     url = f"https://api.jolpi.ca/ergast/f1/{ano_atual}/constructorstandings/"
-    data = cache.get(url)
-    
-    if data is not None:
-        logger.debug("Classificação de construtores obtida do cache")
-    else:
-        data = await busca_json(url)
-        if data is None:
-            return None
-        cache.set(url, data, expire=CACHE_TTL_STANDINGS)
-        logger.info("Classificação de construtores atualizada pela API")
-    
-    # Bloco para quando não for possível acessar a API e não existir cache
+    data = await buscar_com_cache(
+        cache, url, CACHE_TTL_STANDINGS, lambda: busca_json(url), logger, "Classificação de construtores"
+    )
     if data is None:
         return None
 
