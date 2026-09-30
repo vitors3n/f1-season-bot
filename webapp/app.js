@@ -24,6 +24,7 @@ const historyContainer = document.querySelector("#history");
 const rankingUser = document.querySelector("#ranking-user");
 const ranking = document.querySelector("#ranking");
 const adminTab = document.querySelector("#admin-tab");
+const predictionTab = document.querySelector("#prediction-tab");
 const tabs = document.querySelectorAll("[data-tab]");
 const panels = document.querySelectorAll("[data-panel]");
 let abaAtiva = "dashboard";
@@ -53,6 +54,7 @@ async function autenticarTelegram() {
   if (!response.ok) throw new Error(dados.erro);
   user.textContent = `Olá, ${dados.usuario.first_name}`;
   user.hidden = false;
+  predictionTab.hidden = false;
 }
 
 async function carregarProximaCorrida() {
