@@ -37,12 +37,15 @@ def configuracao_padrao():
 
 
 def obter_configuracoes(chat_id):
-    with _conexao() as conexao:
+    conexao = _conexao()
+    try:
         linha = conexao.execute(
             "SELECT timezone, language, reminder_minutes, sessions "
             "FROM configuracoes_chat WHERE chat_id = ?",
             (chat_id,),
         ).fetchone()
+    finally:
+        conexao.close()
 
     if linha is None:
         return configuracao_padrao()
@@ -56,7 +59,8 @@ def obter_configuracoes(chat_id):
 
 
 def salvar_configuracoes(chat_id, configuracoes):
-    with _conexao() as conexao:
+    conexao = _conexao()
+    try:
         conexao.execute(
             """
             INSERT INTO configuracoes_chat
@@ -76,6 +80,9 @@ def salvar_configuracoes(chat_id, configuracoes):
                 json.dumps(configuracoes["sessions"]),
             ),
         )
+        conexao.commit()
+    finally:
+        conexao.close()
 
 
 def alternar_sessao(chat_id, sessao):

@@ -17,7 +17,10 @@ async def pega_corrida():
     if data is None:
         return None
 
-    corrida = data['MRData']['RaceTable']['Races'][0]
-
-    proxima_corrida = Corrida(corrida)
-    return proxima_corrida
+    try:
+        corridas = data["MRData"]["RaceTable"]["Races"]
+        corrida = corridas[0]
+        return Corrida(corrida)
+    except (AttributeError, IndexError, KeyError, TypeError, ValueError):
+        logger.warning("Resposta inválida da API ao buscar a próxima corrida")
+        return None
